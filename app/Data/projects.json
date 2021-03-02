@@ -1,0 +1,61 @@
+{
+    "projects":
+    [
+        {
+            "name": "proj1",
+            "start time": "2020.12.15.",
+            "deadline": "2025.12.13",
+            "description": "testproject1",
+            "priority": "1",
+            "budget": "EUR 100000",
+            "messages": [
+                {
+                    "sender": "Marcell Kegl",
+                    "message": "cool"
+                }
+            ],
+            "roles": [
+                {
+                    "user": "Marcell Kegl",
+                    "role": "Designer"
+                },
+                {
+                    "user": "",
+                    "role": "Designer"
+                },
+                {
+                    "user": "Marcell Kegl2",
+                    "role": "Client"
+                }
+            ]
+        },
+        {
+            "name": "proj2",
+            "start time": "2017.06.06.",
+            "deadline": "2022.05.04.",
+            "description": "coolerproject",
+            "priority": "3",
+            "budget": "EUR 10",
+            "messages": [
+                {
+                    "sender": "Marcell Kegl2",
+                    "message": "cooler"
+                }
+            ],
+            "roles": [
+                {
+                    "user": "Marcell Kegl2",
+                    "role": "Designer"
+                },
+                {
+                    "user": "",
+                    "role": "Designer"
+                },
+                {
+                    "user": "Marcell Kegl1234",
+                    "role": "Client"
+                }
+            ]
+        }
+    ]
+}
