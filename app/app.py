@@ -171,6 +171,7 @@ class Home(Frame):
         self.openProjectButton.grid(row=4, column=0)
         self.requestAccessButton = Button(
             self, text='Request Access', command=self.request_access)
+        self.requestAccessButton.grid(row=4, column=1)
 
     def log_out(self):
         self.controller.show_frame(StartPage)
