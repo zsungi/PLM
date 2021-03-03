@@ -19,9 +19,10 @@ class User:
         self.role = role
 
 class Message:
-    def __init__(self, sender, message):
+    def __init__(self, sender, message, time):
         self.sender = sender
-        self.message = message     
+        self.message = message
+        self.time = time 
 
 class Role:
     def __init__(self, user, role):
@@ -36,16 +37,16 @@ def add_user(user):
             "role": user.role
         }
 
-    with open("/Users/keglmarcell/Desktop/ESILV/PLM/app/Data/users.json", "r") as file:
+    with open("Data/users.json", "r") as file:
         data = json.load(file)
         data["users"].append(data_set)
 
-    with open("/Users/keglmarcell/Desktop/ESILV/PLM/app/Data/users.json", "w") as file:
+    with open("Data/users.json", "w") as file:
         json.dump(data, file)
 
 def load_users():
     users = []
-    with open("/Users/keglmarcell/Desktop/ESILV/PLM/app/Data/users.json", "r") as file:
+    with open("Data/users.json", "r") as file:
         data = json.load(file)
         for element in data["users"]:
             users.append(User(
@@ -57,7 +58,7 @@ def load_users():
 
 def load_projects():
     projects = []
-    with open("/Users/keglmarcell/Desktop/ESILV/PLM/app/Data/projects.json", "r") as file:
+    with open("Data/projects.json", "r") as file:
         data = json.load(file)
         for element in data["projects"]:
             project = project.Project(
@@ -69,7 +70,7 @@ def load_projects():
                 element["budget"],                                  
                 )
             for message in element["messages"]:
-                project.messages.append(Message(message["sender"], message["message"]))
+                project.messages.append(Message(message["sender"], message["message"], message["time"]))
             for role in element["roles"]:
                 project.roles.append(Role(user["user"], role["role"]))
             projects.append(project)
@@ -77,7 +78,7 @@ def load_projects():
 
 def load_projects_for_user(user):
     projects = []
-    with open("/Users/keglmarcell/Desktop/ESILV/PLM/app/Data/projects.json", "r") as file:
+    with open("Data/projects.json", "r") as file:
         data = json.load(file)
         for element in data["projects"]:
             access = False
@@ -90,11 +91,27 @@ def load_projects_for_user(user):
                 element["budget"],                                  
                 )
             for message in element["messages"]:
-                project.messages.append(Message(message["sender"], message["message"]))
+                project.messages.append(Message(message["sender"], message["message"], message["time"]))
             for role in element["roles"]:
                 project.roles.append(Role(role["user"], role["role"]))
                 if role["user"] == user.name:
                     access = True
             if access:
                 projects.append(project)
-    return projects        
+    return projects
+
+def send_message(project, message):
+    data_set = {
+            "sender": message.sender,
+            "message": message.message,
+            "time": message.time,
+        }
+
+    with open("Data/projects.json", "r") as file:
+        data = json.load(file)
+        for idx, p in enumerate(data["projects"]):
+            if p["name"] == project.name:
+                data["projects"][idx]["messages"].append(data_set)
+
+    with open("Data/projects.json", "w") as file:
+        json.dump(data, file)

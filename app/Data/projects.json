@@ -1,6 +1,5 @@
 {
-    "projects":
-    [
+    "projects": [
         {
             "name": "proj1",
             "start time": "2020.12.15.",
@@ -11,7 +10,23 @@
             "messages": [
                 {
                     "sender": "Marcell Kegl",
-                    "message": "cool"
+                    "message": "cool, frjsiuniusdnsnissdmmsdm,sddsisd iajijsij !",
+                    "time": "2020.02.03."
+                },
+                {
+                    "sender": "Valentin",
+                    "message": "Hey",
+                    "time": "2020.05.02."
+                },
+                {
+                    "sender": "Marcell Kegl",
+                    "message": "hello",
+                    "time": "2021-03-03 10:59:03.877224"
+                },
+                {
+                    "sender": "Marcell Kegl",
+                    "message": "cava",
+                    "time": "2021-03-03 11:00:35.536305"
                 }
             ],
             "roles": [
@@ -39,7 +54,8 @@
             "messages": [
                 {
                     "sender": "Marcell Kegl2",
-                    "message": "cooler"
+                    "message": "cooler",
+                    "time": "2020.02.03."
                 }
             ],
             "roles": [
