@@ -291,6 +291,69 @@ class Project(Frame):
         self.priorityLabel.config(text=project.priority)
         self.budgetlabel.config(text=project.budget)
 
+class CreateProduct(Frame):
+    def __init__(self, parent, controller):
+        Frame.__init__(self, parent)
+
+        Label(self, text="Name of product: ").grid(row=0)
+        Label(self, text="Reference: ").grid(row=1)
+        Label(self, text="Supplier: ").grid(row=2)
+        Label(self, text="Status: ").grid(row=3)
+        Label(self, text="Documents: ").grid(row=4, columnspan=2)
+
+        self.nameEntry = Entry(self, text="")
+        self.nameEntry.grid(row=0, column=1)
+        self.referenceEntry = Entry(self, text="")
+        self.referenceEntry.grid(row=1, column=1)
+        self.SupplierEntry = Entry(self, text="")
+        self.SupplierEntry.grid(row=2, column=1)
+        self.StatusOptionMenu = OptionMenu(self, text="")
+        self.StatusOptionMenu.grid(row=3, column=1)
+
+class Product(Frame):
+    def __init__(self, parent, controller):
+        Frame.__init__(self, parent)
+
+        Label(self, text="Name of product: ").grid(row=0)
+        Label(self, text="Reference: ").grid(row=1)
+        Label(self, text="Supplier: ").grid(row=2)
+        Label(self, text="Status: ").grid(row=3)
+        Label(self, text="Documents: ").grid(row=4, columnspan=2)
+        Label(self, text="Messages: ").grid(row=7, columnspan=2)
+
+
+        self.nameLabel = Label(self, text="")
+        self.nameLabel.grid(row=0, column=1)
+        self.referenceLabel = Label(self, text="")
+        self.referenceLabel.grid(row=1, column=1)
+        self.SupplierLabel = Label(self, text="")
+        self.SupplierLabel.grid(row=2, column=1)
+        self.StatusLabel = Label(self, text="")
+        self.StatusLabel.grid(row=3, column=1)
+
+        self.documentlist = Listbox(self)
+        self.documentList.grid(row=5, columnspan=2)
+
+        self.messageList = Listbox(self)
+        self.messageList.grid(row=8, columnspan=2)
+
+        self.addDocumentButton = Button(
+            self, text='Add Document', command=self.add_document)
+        self.addDocumentButton.grid(row=6, column=0)
+
+        self.openDocumentButton = Button(
+            self, text='Add Document', command=self.open_document)
+        self.openDocumentButton.grid(row=6, column=1)
+
+        self.messageEntry = Entry(self)
+        self.messageEntry.insert(0, 'Message')
+        self.messageEntry.grid(row=9, column=0)
+
+        self.sendMessageButton = Button(
+            self, text='Send', command=self.send_message)
+        self.sendMessageButton.grid(row=9, column=1)
+
+
 
 app = App()
 app.mainloop()

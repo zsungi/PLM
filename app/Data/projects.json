@@ -42,6 +42,22 @@
                     "user": "Marcell Kegl2",
                     "role": "Client"
                 }
+            ],
+            "products": [
+                {
+                    "reference": "PSA_00CU000",
+                    "name": "PSA breech",
+                    "Supplier": "PSA",
+                    "Status": "Created",
+                    "Documents": [
+                        {
+                            "name": "Cad-file",
+                            "file": "Documents/breech-1.jpg",
+                            "creted": "2021-03-03 11:00:35.536305",
+                            "modified": "2021-03-03 14:00:35.536305"
+                        }
+                    ]
+                }
             ]
         },
         {
