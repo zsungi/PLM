@@ -1,5 +1,6 @@
 from tkinter import *
 from tkinter import messagebox
+from tkinter import filedialog
 import dataAccess
 from datetime import datetime
 
@@ -20,7 +21,7 @@ class App(Tk):
 
         self.frames = {}
 
-        for F in (StartPage, LogIn, SignUp, Home, Project, CreateProduct, Product):
+        for F in (StartPage, LogIn, SignUp, Home, Project, CreateProduct, Product, AddDocument):
             frame = F(container, self)
             self.frames[F] = frame
             frame.grid(row=0, column=0, sticky="nsew")
@@ -335,15 +336,17 @@ class CreateProduct(Frame):
         self.createProductButton.grid(row=6, column=0)
 
         self.backButton = Button(
-            self, text='Back', command = self.controller.show_frame(Project))
+            self, text='Back', command=lambda: controller.show_frame(Project))
         self.backButton.grid(row=6, column=1)
 
     def create_product(self):
         product = dataAccess.Product(
             self.nameEntry.get(), self.referenceEntry.get(), self.SupplierEntry.get())
         dataAccess.create_product(product, app.currentProject)
+        self.nameEntry.insert(0, '')
+        self.referenceEntry.insert(0, '')
+        self.SupplierEntry.insert(0, '')
         self.controller.open(Project)
-
 
 class Product(Frame):
     def __init__(self, parent, controller):
@@ -352,6 +355,7 @@ class Product(Frame):
         self.project = None
         self.product = None
         self.document_list = []
+        self.controller = controller
 
         Label(self, text="Name of product: ").grid(row=0)
         Label(self, text="Reference: ").grid(row=1)
@@ -377,7 +381,7 @@ class Product(Frame):
         self.messageList.grid(row=8, columnspan=2)
 
         self.addDocumentButton = Button(
-            self, text='Add Document', command=self.add_document)
+            self, text='Add Document', command=lambda: controller.show_frame(AddDocument))
         self.addDocumentButton.grid(row=6, column=0)
 
         self.openDocumentButton = Button(
@@ -397,7 +401,6 @@ class Product(Frame):
         self.backButton.grid(row=12, column=3)
 
     def update(self):
-
         self.project = dataAccess.load_project(app.currentProject.name)
         for prod in self.project.products:
             if prod.reference == app.currentProduct.reference:
@@ -406,6 +409,8 @@ class Product(Frame):
         message_list = self.load_messages()
         self.messageList.delete(0, 'end')
         self.messageList.insert("end", *message_list)
+        self.messageEntry.delete(0, 'end')
+        self.messageEntry.insert(0, 'Message')
 
         self.document_list = self.load_documents()
         self.documentList.delete(0, 'end')
@@ -430,9 +435,6 @@ class Product(Frame):
 
     def open_document(self):
         print()
-
-    def add_document(self):
-        print()
     
     def send_message(self):
         message = dataAccess.Message(
@@ -446,6 +448,49 @@ class Product(Frame):
     def change_status(self):
         print()
 
+class AddDocument(Frame):
+    def __init__(self, parent, controller):
+        Frame.__init__(self, parent)
+
+        self.controller = controller
+        self.filepath = ""
+
+        Label(self, text="Name of document: ").grid(row=0)
+        self.nameEntry = Entry(self, text="")
+        self.nameEntry.grid(row=0, column=1, columnspan = 2)
+
+        Label(self, text="Selected file: ").grid(row=1)
+        self.pathLabel = Label(self, text="")
+        self.pathLabel.grid(row=1, column = 1, columnspan = 2)
+
+        self.addDocumentButton = Button(
+            self, text='Add Document', command=self.add_document)
+        self.addDocumentButton.grid(row=2, column=1)
+
+        self.browseButton = Button(
+            self, text='Browse a file', command=self.browse)
+        self.browseButton.grid(row=2, column=0)
+
+        self.backButton = Button(
+            self, text='Back', command=lambda: controller.show_frame(Product))
+        self.backButton.grid(row=2, column=2)
+
+    def browse(self):
+        self.filepath = filedialog.askopenfilename(initialdir = "/", title = "Select a File")
+        self.pathLabel.config(text=self.filepath)
+
+    def add_document(self):
+        if self.filepath != "" and self.nameEntry.get() != "":
+            document = dataAccess.Document(self.nameEntry.get(), self.filepath, str(datetime.now()))
+            dataAccess.create_document(document, app.currentProduct, app.currentProject)
+            self.controller.open(Product)
+        if self.filepath == "" and self.nameEntry.get() != "":
+            messagebox.showerror("Error", "Please select a file!")
+        if self.filepath != "" and self.nameEntry.get() == "":
+            messagebox.showerror("Error", "Please give a name to the Document!")
+        if self.filepath == "" and self.nameEntry.get() == "":
+            messagebox.showerror("Error", "Please give a name to the Document, and select a file!")
+            
 
 
 app = App()

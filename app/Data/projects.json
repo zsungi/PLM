@@ -76,7 +76,13 @@
                     "supplier": "Toyota",
                     "status": "Created",
                     "documents": [],
-                    "messages": []
+                    "messages": [
+                        {
+                            "sender": "",
+                            "message": "Init",
+                            "time": "2021-03-10 21:36:49.982545"
+                        }
+                    ]
                 }
             ]
         },

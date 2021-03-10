@@ -23,9 +23,9 @@ class Product:
         self.messages = []
 
 class Document:
-    def __init__(self, name, filename, lastModified):
+    def __init__(self, name, filepath, lastModified):
         self.name = name
-        self.file = filename
+        self.file = filepath
         self.lastModified = lastModified
 
 class User:
@@ -92,6 +92,25 @@ def create_product(product, project):
         for idx, p in enumerate(data["projects"]):
             if p["name"] == project.name:
                 data["projects"][idx]["products"].append(data_set)
+
+    with open("app/Data/projects.json", "w") as file:
+        json.dump(data, file)
+
+def create_document(document, product, project):
+    data_set = {
+        "name": document.name,
+        "file": document.file,
+        "last modified": document.lastModified
+    }
+
+    with open("app/Data/projects.json", "r") as file:
+        data = json.load(file)
+        for projidx, proj in enumerate(data["projects"]):
+            if proj["name"] == project.name:
+                for prodidx, prod in enumerate(data["projects"][projidx]["products"]):
+                        if prod["reference"] == product.reference:
+                            data["projects"][projidx]["products"][prodidx]["documents"].append(data_set)
+
 
     with open("app/Data/projects.json", "w") as file:
         json.dump(data, file)
@@ -185,7 +204,6 @@ def load_projects_for_user(user):
             if access:
                 projects.append(project)
     return projects
-
 
 def send_message(project, message, product = None):
     if product is None:
