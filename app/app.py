@@ -8,17 +8,17 @@ class App(Tk):
     def __init__(self, *args, **kwargs):
         Tk.__init__(self, *args, **kwargs)
         self.title("PLM")
+        
+        currentUser = None
 
         container = Frame(self)
         container.pack(side="top", fill="both", expand=True)
         container.grid_rowconfigure(0, weight=1)
         container.grid_columnconfigure(0, weight=1)
 
-        self.user = None
-
         self.frames = {}
 
-        for F in (StartPage, LogIn, SignUp, Home, Project):
+        for F in (StartPage, LogIn, SignUp, Home, Project, CreateProduct, Product):
             frame = F(container, self)
             self.frames[F] = frame
             frame.grid(row=0, column=0, sticky="nsew")
@@ -29,15 +29,19 @@ class App(Tk):
         frame = self.frames[context]
         frame.tkraise()
 
-    def log_in(self, user):
-        self.user = user
+    def log_in(self):
         frame = self.frames[Home]
-        frame.update(user)
+        frame.update()
         frame.tkraise()
 
     def open_project(self, project):
         frame = self.frames[Project]
-        frame.update(project, self.user)
+        frame.update(project)
+        frame.tkraise()
+
+    def open_product(self, product, project):
+        frame = self.frames[Product]
+        frame.update(product, project)
         frame.tkraise()
 
 #    def request_access(self, project):
@@ -55,7 +59,6 @@ class StartPage(Frame):
         signup_page = Button(self, text="Sign Up",
                              command=lambda: controller.show_frame(SignUp))
         signup_page.pack()
-
 
 class LogIn(Frame):
     def __init__(self, parent, controller):
@@ -82,18 +85,17 @@ class LogIn(Frame):
 
     def log_in(self):
         users = dataAccess.load_users()
-        currentUser = None
+        app.currentUser = None
 
         for u in users:
             if u.email == self.emailTextField.get() and u.password == self.passwordTextField.get():
-                currentUser = u
+                app.currentUser = u
 
-        if currentUser is not None:
-            self.controller.log_in(currentUser)
+        if app.currentUser is not None:
+            self.controller.log_in()
         else:
             messagebox.showerror(
                 "Wrong email or password", "We dont have account with this email or your password is wrong, please try again or sign up if You do not have an account yet!")
-
 
 class SignUp(Frame):
     def __init__(self, parent, controller):
@@ -142,17 +144,15 @@ class SignUp(Frame):
             dataAccess.add_user(currentUser)
             messagebox.showinfo(
                 "Welcome", "You successfully signed up, Welcome")
-            self.controller.log_in(currentUser)
+            self.controller.log_in()
         else:
             messagebox.showerror(
                 "Error", "This email is not available, we have a user with this email.")
-
 
 class Home(Frame):
     def __init__(self, parent, controller):
         Frame.__init__(self, parent)
 
-        self.user = None
         self.controller = controller
         self.projects = []
 
@@ -176,12 +176,10 @@ class Home(Frame):
     def log_out(self):
         self.controller.show_frame(StartPage)
 
-    def update(self, user):
-        self.user = user
-        self.projects = dataAccess.load_projects_for_user(user)
-        project_names = self.get_project_names(user)
-#        self.otherprojects = dataAccess.load_projects_for_user(user)
-        self.nameLabel.config(text=user.name)
+    def update(self):
+        self.projects = dataAccess.load_projects_for_user(app.currentUser)
+        project_names = self.get_project_names(app.currentUser)
+        self.nameLabel.config(text=app.currentUser.name)
         self.projectsList.delete(0, 'end')
         self.projectsList.insert("end", *project_names)
 
@@ -199,48 +197,48 @@ class Home(Frame):
             messagebox.showerror("Error", "Select one project")
 
     def request_access(self):
-        selection = self.projectsList.curselection()
-        if len(selection) == 1:
-            self.controller.request_access(self.projects[selection[0]])
-        else:
-            messagebox.showerror("Error", "Select one project")
-
+        print()
+        #Todo:
+        #-add new key to project jsons: request
+        #-if you request add your request to this list
+        #-add new key to project json: creator
+        #if the creator log in show message dialog with the request to accept or deny            
 
 class Project(Frame):
     def __init__(self, parent, controller):
         Frame.__init__(self, parent)
 
         self.project = None
-        self.user = None
         self.controller = controller
+        self.product_list = []
 
-        Label(self, text="Name of project: ").grid(row=0)
-        Label(self, text="Start time: ").grid(row=1)
-        Label(self, text="Deadline: ").grid(row=2)
-        Label(self, text="Description: ").grid(row=3)
-        Label(self, text="Priority: ").grid(row=4)
-        Label(self, text="Budget: ").grid(row=5)
-        Label(self, text="Messages: ").grid(row=6, columnspan=2)
+        Label(self, text="Name of project: ").grid(row=0,  columnspan = 2)
+        Label(self, text="Start time: ").grid(row=1,  columnspan = 2)
+        Label(self, text="Deadline: ").grid(row=2,  columnspan = 2)
+        Label(self, text="Description: ").grid(row=3,  columnspan = 2)
+        Label(self, text="Priority: ").grid(row=4,  columnspan = 2)
+        Label(self, text="Budget: ").grid(row=5,  columnspan = 2)
+        Label(self, text="Messages: ").grid(row=7, columnspan=4)
 
         self.nameLabel = Label(self, text="")
-        self.nameLabel.grid(row=0, column=1)
+        self.nameLabel.grid(row=0, column=2,  columnspan = 2)
         self.startTimeLabel = Label(self, text="")
-        self.startTimeLabel.grid(row=1, column=1)
+        self.startTimeLabel.grid(row=1, column=2,  columnspan = 2)
         self.deadlineLabel = Label(self, text="")
-        self.deadlineLabel.grid(row=2, column=1)
+        self.deadlineLabel.grid(row=2, column=2,  columnspan = 2)
         self.descriptionLabel = Label(self, text="")
-        self.descriptionLabel.grid(row=3, column=1)
+        self.descriptionLabel.grid(row=3, column=2,  columnspan = 2)
         self.priorityLabel = Label(self, text="")
-        self.priorityLabel.grid(row=4, column=1)
+        self.priorityLabel.grid(row=4, column=2,  columnspan = 2)
         self.budgetlabel = Label(self, text="")
-        self.budgetlabel.grid(row=5, column=1)
+        self.budgetlabel.grid(row=5, column=2,  columnspan = 2)
 
         self.messageList = Listbox(self)
-        self.messageList.grid(row=7, columnspan=2)
+        self.messageList.grid(row=8, columnspan=4)
 
         self.messageEntry = Entry(self)
         self.messageEntry.insert(0, 'Message')
-        self.messageEntry.grid(row=8, column=0)
+        self.messageEntry.grid(row=9, column=0, columnspan = 3)
         # Todo: make placeholder works
         self.messageEntry.bind(
             "<FocusIn>", self.messageEntry.delete("0", "end"))
@@ -249,40 +247,65 @@ class Project(Frame):
 
         self.sendMessageButton = Button(
             self, text='Send', command=self.send_message)
-        self.sendMessageButton.grid(row=8, column=1)
+        self.sendMessageButton.grid(row=9, column=3)
+
+        self.editProjectButton = Button(
+            self, text='Open product', command=self.open_product)
+        self.editProjectButton.grid(row=12, column=0)
+
+        Label(self, text="Products:").grid(row=10, columnspan=4)
+
+        self.productList = Listbox(self)
+        self.productList.grid(row=11, columnspan=4)
 
         self.editProjectButton = Button(
             self, text='Edit Project', command=self.edit_project)
-        self.editProjectButton.grid(row=9, column=0)
+        self.editProjectButton.grid(row=6, column=0,  columnspan = 4)
 
         self.backButton = Button(
             self, text='Back', command=lambda: controller.show_frame(Home))
-        self.backButton.grid(row=9, column=1)
+        self.backButton.grid(row=12, column=3)
+
+    def open_product(self):
+        selection = self.productList.curselection()
+        if len(selection) == 1:
+            self.controller.open_product(self.project.products[selection[0]], self.project)
+        else:
+            messagebox.showerror("Error", "Select one product")
 
     def edit_project(self):
         print("")
 
     def send_message(self):
         message = dataAccess.Message(
-            self.user.name, self.messageEntry.get(), str(datetime.now()))
+            app.currentUser.name, self.messageEntry.get(), str(datetime.now()))
         dataAccess.send_message(self.project, message)
         self.project.messages.append(message)
-        message_list = self.load_messages(self.project)
+        message_list = self.load_messages()
         self.messageList.delete(0, 'end')
         self.messageList.insert("end", *message_list)
 
-    def load_messages(self, project):
+    def load_messages(self):
         messages = []
-        for message in project.messages:
+        for message in self.project.messages:
             messages.append(message.sender + ": " + message.message)
         return messages
 
-    def update(self, project, user):
-        self.user = user
-        self.project = project
-        message_list = self.load_messages(project)
+    def load_products(self):
+        products = []
+        for product in self.project.products:
+            products.append(product.name + " - " + product.reference)
+        return products
+
+    def update(self, project):
+        self.project = dataAccess.load_project(project.name)
+        message_list = self.load_messages()
         self.messageList.delete(0, 'end')
         self.messageList.insert("end", *message_list)
+
+        self.product_list = self.load_products()
+        self.productList.delete(0, 'end')
+        self.productList.insert("end", *self.product_list)
 
         self.nameLabel.config(text=project.name)
         self.startTimeLabel.config(text=project.startTime)
@@ -298,8 +321,6 @@ class CreateProduct(Frame):
         Label(self, text="Name of product: ").grid(row=0)
         Label(self, text="Reference: ").grid(row=1)
         Label(self, text="Supplier: ").grid(row=2)
-        Label(self, text="Status: ").grid(row=3)
-        Label(self, text="Documents: ").grid(row=4, columnspan=2)
 
         self.nameEntry = Entry(self, text="")
         self.nameEntry.grid(row=0, column=1)
@@ -307,12 +328,27 @@ class CreateProduct(Frame):
         self.referenceEntry.grid(row=1, column=1)
         self.SupplierEntry = Entry(self, text="")
         self.SupplierEntry.grid(row=2, column=1)
-        self.StatusOptionMenu = OptionMenu(self, text="")
-        self.StatusOptionMenu.grid(row=3, column=1)
+
+        self.createProductButton = Button(
+            self, text='Create product', command=self.create_product)
+        self.createProductButton.grid(row=6, column=0)
+
+    def create_product(self):
+        product = dataAccess.Product(
+            self.nameEntry.get(), self.referenceEntry.get(), self.SupplierEntry.get(), )
+        dataAccess.send_message(self.project, message)
+        self.project.messages.append(message)
+        message_list = self.load_messages(self.project)
+        self.messageList.delete(0, 'end')
+        self.messageList.insert("end", *message_list)
 
 class Product(Frame):
     def __init__(self, parent, controller):
         Frame.__init__(self, parent)
+
+        self.project = None
+        self.product = None
+        self.document_list = []
 
         Label(self, text="Name of product: ").grid(row=0)
         Label(self, text="Reference: ").grid(row=1)
@@ -326,12 +362,12 @@ class Product(Frame):
         self.nameLabel.grid(row=0, column=1)
         self.referenceLabel = Label(self, text="")
         self.referenceLabel.grid(row=1, column=1)
-        self.SupplierLabel = Label(self, text="")
-        self.SupplierLabel.grid(row=2, column=1)
-        self.StatusLabel = Label(self, text="")
-        self.StatusLabel.grid(row=3, column=1)
+        self.supplierLabel = Label(self, text="")
+        self.supplierLabel.grid(row=2, column=1)
+        self.statusLabel = Label(self, text="")
+        self.statusLabel.grid(row=3, column=1)
 
-        self.documentlist = Listbox(self)
+        self.documentList = Listbox(self)
         self.documentList.grid(row=5, columnspan=2)
 
         self.messageList = Listbox(self)
@@ -342,7 +378,7 @@ class Product(Frame):
         self.addDocumentButton.grid(row=6, column=0)
 
         self.openDocumentButton = Button(
-            self, text='Add Document', command=self.open_document)
+            self, text='Open Document', command=self.open_document)
         self.openDocumentButton.grid(row=6, column=1)
 
         self.messageEntry = Entry(self)
@@ -352,6 +388,60 @@ class Product(Frame):
         self.sendMessageButton = Button(
             self, text='Send', command=self.send_message)
         self.sendMessageButton.grid(row=9, column=1)
+
+        self.backButton = Button(
+            self, text='Back', command=lambda: controller.show_frame(Project))
+        self.backButton.grid(row=12, column=3)
+
+    def update(self, product, project):
+
+        self.project = dataAccess.load_project(project.name)
+        for prod in self.project.products:
+            if prod.reference == product.reference:
+                self.product = prod
+
+        message_list = self.load_messages()
+        self.messageList.delete(0, 'end')
+        self.messageList.insert("end", *message_list)
+
+        self.document_list = self.load_documents()
+        self.documentList.delete(0, 'end')
+        self.documentList.insert("end", *self.document_list)
+
+        self.nameLabel.config(text=product.name)
+        self.referenceLabel.config(text=product.reference)
+        self.supplierLabel.config(text=product.supplier)
+        self.statusLabel.config(text=product.status)
+
+    def load_messages(self):
+        messages = []
+        for message in self.product.messages:
+            messages.append(message.sender + ": " + message.message)
+        return messages
+
+    def load_documents(self):
+        documents = []
+        for document in self.product.documents:
+            documents.append(document.name)
+        return documents
+
+    def open_document(self):
+        print()
+
+    def add_document(self):
+        print()
+    
+    def send_message(self):
+        message = dataAccess.Message(
+            app.currentUser.name, self.messageEntry.get(), str(datetime.now()))
+        dataAccess.send_message(self.project, message, self.product)
+        self.product.messages.append(message)
+        message_list = self.load_messages()
+        self.messageList.delete(0, 'end')
+        self.messageList.insert("end", *message_list)
+
+    def change_status(self):
+        print()
 
 
 

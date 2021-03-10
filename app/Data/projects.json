@@ -6,6 +6,7 @@
             "deadline": "2025.12.13",
             "description": "testproject1",
             "priority": "1",
+            "creator": "Marcell Kegl",
             "budget": "EUR 100000",
             "messages": [
                 {
@@ -47,14 +48,25 @@
                 {
                     "reference": "PSA_00CU000",
                     "name": "PSA breech",
-                    "Supplier": "PSA",
-                    "Status": "Created",
-                    "Documents": [
+                    "supplier": "PSA",
+                    "status": "Created",
+                    "documents": [
                         {
                             "name": "Cad-file",
                             "file": "Documents/breech-1.jpg",
-                            "creted": "2021-03-03 11:00:35.536305",
-                            "modified": "2021-03-03 14:00:35.536305"
+                            "last modified": "2021-03-03 14:00:35.536305"
+                        }
+                    ],
+                    "messages": [
+                        {
+                            "sender": "Marcell Kegl",
+                            "message": "cool, product created, go on with the design",
+                            "time": "2020.02.03."
+                        },
+                        {
+                            "sender": "Valentin",
+                            "message": "Ok",
+                            "time": "2021-03-10 19:18:27.180499"
                         }
                     ]
                 }
@@ -66,6 +78,7 @@
             "deadline": "2022.05.04.",
             "description": "coolerproject",
             "priority": "3",
+            "creator": "Marcell Kegl",
             "budget": "EUR 10",
             "messages": [
                 {
@@ -87,7 +100,8 @@
                     "user": "Marcell Kegl1234",
                     "role": "Client"
                 }
-            ]
+            ],
+            "products": []
         }
     ]
 }
