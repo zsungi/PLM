@@ -3,8 +3,10 @@ from tkinter import messagebox
 from tkinter import filedialog
 from PIL import Image, ImageTk
 import dataAccess
+import os
 from datetime import datetime
 import uuid
+from shutil import copyfile
 
 
 class App(Tk):
@@ -564,12 +566,13 @@ class Product(Frame):
         selection = self.documentList.curselection()
         if len(selection) == 1:
             document = self.product.documents[selection[0]]
-            img = ImageTk.PhotoImage(Image.open(document.file))
+            img = ImageTk.PhotoImage(Image.open(os.getcwd() + "/app/Documents/" + document.id + ".jpg"))
             newWindow = Toplevel(self.controller)
             newWindow.title(document.name)
             imageLabel = Label(newWindow, image=img)
             imageLabel.pack()
-            imageLabel.image = test
+            imageLabel.image = img
+
         else:
             messagebox.showerror("Error", "Select one Document")
     
@@ -657,8 +660,10 @@ class AddDocument(Frame):
 
     def add_document(self):
         if self.filepath != "" and self.nameEntry.get() != "":
+            head_tail = os.path.split(self.filepath)
             document = dataAccess.Document(str(uuid.uuid1()), self.nameEntry.get(), self.filepath, str(datetime.now()))
             dataAccess.create_document(document, app.currentProduct, app.currentProject)
+            copyfile(self.filepath, os.getcwd() + "/app/Documents/" + document.id + ".jpg")
             self.controller.open(Product)
         if self.filepath == "" and self.nameEntry.get() != "":
             messagebox.showerror("Error", "Please select a file!")
@@ -666,21 +671,6 @@ class AddDocument(Frame):
             messagebox.showerror("Error", "Please give a name to the Document!")
         if self.filepath == "" and self.nameEntry.get() == "":
             messagebox.showerror("Error", "Please give a name to the Document, and select a file!")
-            
-class ShowDocument(Frame):
-    def __init__(self, parent, controller):
-        Frame.__init__(self, parent)
-
-        self.controller = controller
-
-        self.imageLabel = tkinter.Label(image=img)
-        self.imageLabel.pack()
-
-
-
-    def update(self):
-        img = ImageTk.PhotoImage(Image.open(app.currentDocument.file))
-        self.imageLabel.image = img
 
 
 
