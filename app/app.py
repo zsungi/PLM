@@ -1,6 +1,7 @@
 from tkinter import *
 from tkinter import messagebox
 from tkinter import filedialog
+from PIL import Image, ImageTk
 import dataAccess
 from datetime import datetime
 import uuid
@@ -560,7 +561,17 @@ class Product(Frame):
         self.controller.open(EditProduct)
 
     def open_document(self):
-        print()
+        selection = self.documentList.curselection()
+        if len(selection) == 1:
+            document = self.product.documents[selection[0]]
+            img = ImageTk.PhotoImage(Image.open(document.file))
+            newWindow = Toplevel(self.controller)
+            newWindow.title(document.name)
+            imageLabel = Label(newWindow, image=img)
+            imageLabel.pack()
+            imageLabel.image = test
+        else:
+            messagebox.showerror("Error", "Select one Document")
     
     def send_message(self):
         message = dataAccess.Message(
@@ -571,8 +582,47 @@ class Product(Frame):
         self.messageList.delete(0, 'end')
         self.messageList.insert("end", *message_list)
 
-    def change_status(self):
-        print()
+class EditProduct(Frame):
+    def __init__(self, parent, controller):
+        Frame.__init__(self, parent)
+
+        self.controller = controller
+        self.status = StringVar(self.master)
+        options = {"Created", "Concept", "Planning", "Development", "Qualification", "Launch"}
+
+        Label(self, text="Name of product: ").grid(row=0)
+        Label(self, text="Reference: ").grid(row=1)
+        Label(self, text="Supplier: ").grid(row=2)
+        Label(self, text="Status: ").grid(row=3)
+
+        self.nameEntry = Entry(self, text="")
+        self.nameEntry.grid(row=0, column=1)
+        self.referenceEntry = Entry(self, text="")
+        self.referenceEntry.grid(row=1, column=1)
+        self.SupplierEntry = Entry(self, text="")
+        self.SupplierEntry.grid(row=2, column=1)
+        self.statusOptionMenu = OptionMenu(self, self.status, *options)
+        self.statusOptionMenu.grid(row=3, column=1)
+
+        self.createProductButton = Button(
+            self, text='Edit product', command=self.edit_product)
+        self.createProductButton.grid(row=6, column=0)
+
+        self.backButton = Button(
+            self, text='Back', command=lambda: controller.show_frame(Project))
+        self.backButton.grid(row=6, column=1)
+
+    def edit_product(self):
+        product = dataAccess.Product(
+            app.currentProduct.id, self.nameEntry.get(), self.referenceEntry.get(), self.SupplierEntry.get(), self.status.get())
+        dataAccess.edit_product(product, app.currentProject)
+        self.controller.open(Project)
+
+    def update(self):
+        self.status.set(app.currentProduct.status)
+        self.nameEntry.insert(0, app.currentProduct.name)
+        self.referenceEntry.insert(0, app.currentProduct.reference)
+        self.SupplierEntry.insert(0, app.currentProduct.supplier)
 
 class AddDocument(Frame):
     def __init__(self, parent, controller):
@@ -617,47 +667,21 @@ class AddDocument(Frame):
         if self.filepath == "" and self.nameEntry.get() == "":
             messagebox.showerror("Error", "Please give a name to the Document, and select a file!")
             
-class EditProduct(Frame):
+class ShowDocument(Frame):
     def __init__(self, parent, controller):
         Frame.__init__(self, parent)
 
         self.controller = controller
-        self.status = StringVar(self.master)
-        options = {"Created", "Concept", "Planning", "Development", "Qualification", "Launch"}
 
-        Label(self, text="Name of product: ").grid(row=0)
-        Label(self, text="Reference: ").grid(row=1)
-        Label(self, text="Supplier: ").grid(row=2)
-        Label(self, text="Status: ").grid(row=3)
+        self.imageLabel = tkinter.Label(image=img)
+        self.imageLabel.pack()
 
-        self.nameEntry = Entry(self, text="")
-        self.nameEntry.grid(row=0, column=1)
-        self.referenceEntry = Entry(self, text="")
-        self.referenceEntry.grid(row=1, column=1)
-        self.SupplierEntry = Entry(self, text="")
-        self.SupplierEntry.grid(row=2, column=1)
-        self.statusOptionMenu = OptionMenu(self, self.status, *options)
-        self.statusOptionMenu.grid(row=3, column=1)
 
-        self.createProductButton = Button(
-            self, text='Edit product', command=self.edit_product)
-        self.createProductButton.grid(row=6, column=0)
-
-        self.backButton = Button(
-            self, text='Back', command=lambda: controller.show_frame(Project))
-        self.backButton.grid(row=6, column=1)
-
-    def edit_product(self):
-        product = dataAccess.Product(
-            app.currentProduct.id, self.nameEntry.get(), self.referenceEntry.get(), self.SupplierEntry.get(), self.status.get())
-        dataAccess.edit_product(product, app.currentProject)
-        self.controller.open(Project)
 
     def update(self):
-        self.status = app.currentProduct.status
-        self.nameEntry.insert(0, app.currentProduct.name)
-        self.referenceEntry.insert(0, app.currentProduct.reference)
-        self.SupplierEntry.insert(0, app.currentProduct.supplier)
+        img = ImageTk.PhotoImage(Image.open(app.currentDocument.file))
+        self.imageLabel.image = img
+
 
 
 
