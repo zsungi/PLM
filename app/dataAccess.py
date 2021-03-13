@@ -1,20 +1,22 @@
 import json
 
-
 class Project:
-    def __init__(self, name, startTime, deadline, description, priority, budget):
+    def __init__(self, ident, name, startTime, deadline, description, priority, budget, creator):
+        self.id = ident
         self.name = name
         self.startTime = startTime
         self.deadline = deadline
         self.description = description
         self.priority = priority
         self.budget = budget
+        self.creator = creator
         self.messages = []
         self.products = []
         self.roles = []
 
 class Product:
-    def __init__(self, name, reference, supplier, status = "Created"):
+    def __init__(self, ident, name, reference, supplier, status = "Created"):
+        self.id = ident
         self.name = name
         self.reference = reference
         self.supplier = supplier
@@ -23,13 +25,15 @@ class Product:
         self.messages = []
 
 class Document:
-    def __init__(self, name, filepath, lastModified):
+    def __init__(self, ident, name, filepath, lastModified):
+        self.id = ident
         self.name = name
         self.file = filepath
         self.lastModified = lastModified
 
 class User:
-    def __init__(self, name, email, password, role):
+    def __init__(self, ident, name, email, password, role):
+        self.id = ident
         self.name = name
         self.email = email
         self.password = password
@@ -37,20 +41,23 @@ class User:
 
 
 class Message:
-    def __init__(self, sender, message, time):
+    def __init__(self, ident, sender, message, time):
+        self.id = ident
         self.sender = sender
         self.message = message
         self.time = time
 
 
 class Role:
-    def __init__(self, user, role):
+    def __init__(self, ident, user, role):
+        self.id = ident
         self.user = user
         self.role = role
 
 
 def add_user(user):
     data_set = {
+        "id": user.id,
         "name": user.name,
         "email": user.email,
         "password": user.password,
@@ -64,21 +71,50 @@ def add_user(user):
     with open("app/Data/users.json", "w") as file:
         json.dump(data, file)
 
-
 def load_users():
     users = []
     with open("app/Data/users.json", "r") as file:
         data = json.load(file)
         for element in data["users"]:
             users.append(User(
+                element["id"],
                 element["name"],
                 element["email"],
                 element["password"],
                 element["role"]))
     return users
 
+def create_project(project):
+    data_set = {
+        "id": project.id,
+        "name": project.name,
+        "start time": project.startTime,
+        "deadline": project.deadline,
+        "description": project.description,
+        "priority": project.priority,
+        "creator": {
+            "id": project.creator.id,
+            "name": project.creator.name,
+            "email": project.creator.email,
+            "password": project.creator.password,
+            "role": project.creator.role
+        },
+        "budget": project.budget,
+        "messages": [],
+        "products": [],
+        "roles": []
+    }
+
+    with open("app/Data/projects.json", "r") as file:
+        data = json.load(file)
+        data["projects"].append(data_set)
+
+    with open("app/Data/projects.json", "w") as file:
+        json.dump(data, file)
+
 def create_product(product, project):
     data_set = {
+        "id": product.id,
         "name": product.name,
         "reference": product.reference,
         "supplier": product.supplier,
@@ -90,14 +126,30 @@ def create_product(product, project):
     with open("app/Data/projects.json", "r") as file:
         data = json.load(file)
         for idx, p in enumerate(data["projects"]):
-            if p["name"] == project.name:
+            if p["id"] == project.id:
                 data["projects"][idx]["products"].append(data_set)
+
+    with open("app/Data/projects.json", "w") as file:
+        json.dump(data, file)
+
+def edit_product(product, project):
+    with open("app/Data/projects.json", "r") as file:
+        data = json.load(file)
+        for projidx, proj in enumerate(data["projects"]):
+            if proj["id"] == project.id:
+                for prodidx, prod in enumerate(data["projects"][projidx]["products"]):
+                    if prod["id"] == product.id:
+                        data["projects"][projidx]["products"][prodidx]["name"] = product.name
+                        data["projects"][projidx]["products"][prodidx]["reference"] = product.reference
+                        data["projects"][projidx]["products"][prodidx]["supplier"] = product.supplier
+                        data["projects"][projidx]["products"][prodidx]["status"] = product.status
 
     with open("app/Data/projects.json", "w") as file:
         json.dump(data, file)
 
 def create_document(document, product, project):
     data_set = {
+        "id": document.id,
         "name": document.name,
         "file": document.file,
         "last modified": document.lastModified
@@ -106,10 +158,10 @@ def create_document(document, product, project):
     with open("app/Data/projects.json", "r") as file:
         data = json.load(file)
         for projidx, proj in enumerate(data["projects"]):
-            if proj["name"] == project.name:
+            if proj["id"] == project.id:
                 for prodidx, prod in enumerate(data["projects"][projidx]["products"]):
-                        if prod["reference"] == product.reference:
-                            data["projects"][projidx]["products"][prodidx]["documents"].append(data_set)
+                    if prod["id"] == product.id:
+                        data["projects"][projidx]["products"][prodidx]["documents"].append(data_set)
 
 
     with open("app/Data/projects.json", "w") as file:
@@ -120,56 +172,69 @@ def load_projects():
     with open("app/Data/projects.json", "r") as file:
         data = json.load(file)
         for element in data["projects"]:
-            project = project.Project(
+            creator = User(
+                element["creator"]["id"],
+                element["creator"]["name"],
+                element["creator"]["email"],
+                element["creator"]["password"],
+                element["creator"]["role"])
+            project = Project(
+                element["id"],
                 element["name"],
                 element["start time"],
                 element["deadline"],
                 element["description"],
                 element["priority"],
                 element["budget"],
+                creator
             )
             for message in element["messages"]:
                 project.messages.append(
-                    Message(message["sender"], message["message"], message["time"]))
+                    Message(message["id"], message["sender"], message["message"], message["time"]))
             for role in element["roles"]:
-                project.roles.append(Role(role["user"], role["role"]))
+                project.roles.append(Role(role["id"], role["user"], role["role"]))
             for product in element["products"]:
-                temp = Product(product["name"], product["reference"], product["supplier"], product["status"])
+                temp = Product(product["id"], product["name"], product["reference"], product["supplier"], product["status"])
                 for document in product["documents"]:
-                    temp.documents.append(Document(document["name"], document["file"], document["last modified"]))
+                    temp.documents.append(Document(document["id"], document["name"], document["file"], document["last modified"]))
                 for message in product["messages"]:
-                    temp.messages.append(Message(message["sender"], message["message"], message["time"]))
+                    temp.messages.append(Message(message["id"], message["sender"], message["message"], message["time"]))
                 project.products.append(temp)
-
-            for role in element["roles"]:
-                project.roles.append(Role(user["user"], role["role"]))
             projects.append(project)
     return projects
 
-def load_project(projectname):
+def load_project(project):
     with open("app/Data/projects.json", "r") as file:
         data = json.load(file)
         for element in data["projects"]:
-            if element["name"] == projectname:
+            if element["id"] == projectid:
+                creator = User(
+                element["creator"]["id"],
+                element["creator"]["name"],
+                element["creator"]["email"],
+                element["creator"]["password"],
+                element["creator"]["role"])
                 project = Project(
-                element["name"],
-                element["start time"],
-                element["deadline"],
-                element["description"],
-                element["priority"],
-                element["budget"],
+                    element["id"],
+                    element["name"],
+                    element["start time"],
+                    element["deadline"],
+                    element["description"],
+                    element["priority"],
+                    element["budget"],
+                    creator
                 )
                 for message in element["messages"]:
                     project.messages.append(
-                        Message(message["sender"], message["message"], message["time"]))
+                        Message(message["id"], message["sender"], message["message"], message["time"]))
                 for role in element["roles"]:
-                    project.roles.append(Role(role["user"], role["role"]))
+                    project.roles.append(Role(role["id"], role["user"], role["role"]))
                 for product in element["products"]:
-                    temp = Product(product["name"], product["reference"], product["supplier"], product["status"])
+                    temp = Product(product["id"], product["name"], product["reference"], product["supplier"], product["status"])
                     for document in product["documents"]:
-                        temp.documents.append(Document(document["name"], document["file"], document["last modified"]))
+                        temp.documents.append(Document(document["id"], document["name"], document["file"], document["last modified"]))
                     for message in product["messages"]:
-                        temp.messages.append(Message(message["sender"], message["message"], message["time"]))
+                        temp.messages.append(Message(message["id"], message["sender"], message["message"], message["time"]))
                     project.products.append(temp)
     return project
 
@@ -179,27 +244,35 @@ def load_projects_for_user(user):
         data = json.load(file)
         for element in data["projects"]:
             access = False
+            creator = User(
+                element["creator"]["id"],
+                element["creator"]["name"],
+                element["creator"]["email"],
+                element["creator"]["password"],
+                element["creator"]["role"])
             project = Project(
+                element["id"],
                 element["name"],
                 element["start time"],
                 element["deadline"],
                 element["description"],
                 element["priority"],
                 element["budget"],
+                creator
             )
             for message in element["messages"]:
                 project.messages.append(
-                    Message(message["sender"], message["message"], message["time"]))
+                    Message(message["id"], message["sender"], message["message"], message["time"]))
             for role in element["roles"]:
-                project.roles.append(Role(role["user"], role["role"]))
-                if role["user"] == user.name:
+                project.roles.append(Role(role["id"], role["user"], role["role"]))
+                if role["id"] == user.id:
                     access = True
             for product in element["products"]:
-                temp = Product(product["name"], product["reference"], product["supplier"], product["status"])
+                temp = Product(product["id"], product["name"], product["reference"], product["supplier"], product["status"])
                 for document in product["documents"]:
-                    temp.documents.append(Document(document["name"], document["file"], document["last modified"]))
+                    temp.documents.append(Document(document["id"], document["name"], document["file"], document["last modified"]))
                 for message in product["messages"]:
-                    temp.messages.append(Message(message["sender"], message["message"], message["time"]))
+                    temp.messages.append(Message(message["id"], message["sender"], message["message"], message["time"]))
                 project.products.append(temp)
             if access:
                 projects.append(project)
@@ -208,6 +281,7 @@ def load_projects_for_user(user):
 def send_message(project, message, product = None):
     if product is None:
         data_set = {
+            "id": message.id,
             "sender": message.sender,
             "message": message.message,
             "time": message.time,
@@ -216,13 +290,14 @@ def send_message(project, message, product = None):
         with open("app/Data/projects.json", "r") as file:
             data = json.load(file)
             for idx, p in enumerate(data["projects"]):
-                if p["name"] == project.name:
+                if p["id"] == project.id:
                     data["projects"][idx]["messages"].append(data_set)
 
         with open("app/Data/projects.json", "w") as file:
             json.dump(data, file)
     if product is not None:
         data_set = {
+            "id": message.id,
             "sender": message.sender,
             "message": message.message,
             "time": message.time,
@@ -231,9 +306,9 @@ def send_message(project, message, product = None):
         with open("app/Data/projects.json", "r") as file:
             data = json.load(file)
             for projidx, proj in enumerate(data["projects"]):
-                if proj["name"] == project.name:
+                if proj["id"] == project.id:
                     for prodidx, prod in enumerate(data["projects"][projidx]["products"]):
-                        if prod["reference"] == product.reference:
+                        if prod["id"] == product.id:
                             data["projects"][projidx]["products"][prodidx]["messages"].append(data_set)
 
         with open("app/Data/projects.json", "w") as file:

@@ -3,6 +3,7 @@ from tkinter import messagebox
 from tkinter import filedialog
 import dataAccess
 from datetime import datetime
+import uuid
 
 
 class App(Tk):
@@ -21,7 +22,7 @@ class App(Tk):
 
         self.frames = {}
 
-        for F in (StartPage, LogIn, SignUp, Home, Project, CreateProduct, Product, AddDocument):
+        for F in (StartPage, LogIn, SignUp, Home, Project, CreateProject, CreateProduct, Product, AddDocument, EditProduct):
             frame = F(container, self)
             self.frames[F] = frame
             frame.grid(row=0, column=0, sticky="nsew")
@@ -86,6 +87,8 @@ class LogIn(Frame):
                 app.currentUser = u
 
         if app.currentUser is not None:
+            self.emailTextField.insert(0, '')
+            self.passwordTextField.insert(0, '')
             self.controller.open(Home)
         else:
             messagebox.showerror(
@@ -133,11 +136,15 @@ class SignUp(Frame):
 
     def sign_up(self):
         if self.email_is_available(self.emailTextField.get()):
-            app.currentUser = dataAccess.User(self.nameTextField.get(
+            app.currentUser = dataAccess.User(str(uuid.uuid1()), self.nameTextField.get(
             ), self.emailTextField.get(), self.passwordTextField.get(), self.role.get())
             dataAccess.add_user(app.currentUser)
             messagebox.showinfo(
                 "Welcome", "You successfully signed up, Welcome")
+            self.nameTextField.insert(0, '')
+            self.emailTextField.insert(0, '')
+            self.passwordTextField.insert(0, '')
+            self.role.set("Client")
             self.controller.open(Home)
         else:
             messagebox.showerror(
@@ -163,9 +170,14 @@ class Home(Frame):
         self.openProjectButton = Button(
             self, text='Open Project', command=self.open_project)
         self.openProjectButton.grid(row=4, column=0)
+
         self.requestAccessButton = Button(
             self, text='Request Access', command=self.request_access)
-        self.requestAccessButton.grid(row=4, column=1)
+        self.requestAccessButton.grid(row=4, column=2)
+
+        self.createProject = Button(
+            self, text='Create Project', command=lambda: controller.show_frame(CreateProject))
+        self.createProject.grid(row=4, column=1)
 
     def log_out(self):
         self.controller.show_frame(StartPage)
@@ -191,6 +203,9 @@ class Home(Frame):
         else:
             messagebox.showerror("Error", "Select one project")
 
+    def create_project(self):
+        self.controlle.open(CreateProject)
+
     def request_access(self):
         print()
         #Todo:
@@ -212,8 +227,9 @@ class Project(Frame):
         Label(self, text="Deadline: ").grid(row=2,  columnspan = 2)
         Label(self, text="Description: ").grid(row=3,  columnspan = 2)
         Label(self, text="Priority: ").grid(row=4,  columnspan = 2)
-        Label(self, text="Budget: ").grid(row=5,  columnspan = 2)
-        Label(self, text="Messages: ").grid(row=7, columnspan=4)
+        Label(self, text="Creator: ").grid(row=5,  columnspan = 2)
+        Label(self, text="Budget: ").grid(row=6,  columnspan = 2)
+        Label(self, text="Messages: ").grid(row=8, columnspan=4)
 
         self.nameLabel = Label(self, text="")
         self.nameLabel.grid(row=0, column=2,  columnspan = 2)
@@ -225,15 +241,17 @@ class Project(Frame):
         self.descriptionLabel.grid(row=3, column=2,  columnspan = 2)
         self.priorityLabel = Label(self, text="")
         self.priorityLabel.grid(row=4, column=2,  columnspan = 2)
+        self.creatorLabel = Label(self, text="")
+        self.creatorLabel.grid(row=5, column=2,  columnspan = 2)
         self.budgetlabel = Label(self, text="")
-        self.budgetlabel.grid(row=5, column=2,  columnspan = 2)
+        self.budgetlabel.grid(row=6, column=2,  columnspan = 2)
 
         self.messageList = Listbox(self)
-        self.messageList.grid(row=8, columnspan=4)
+        self.messageList.grid(row=9, columnspan=4)
 
         self.messageEntry = Entry(self)
         self.messageEntry.insert(0, 'Message')
-        self.messageEntry.grid(row=9, column=0, columnspan = 3)
+        self.messageEntry.grid(row=10, column=0, columnspan = 3)
         # Todo: make placeholder works
         self.messageEntry.bind(
             "<FocusIn>", self.messageEntry.delete("0", "end"))
@@ -242,28 +260,28 @@ class Project(Frame):
 
         self.sendMessageButton = Button(
             self, text='Send', command=self.send_message)
-        self.sendMessageButton.grid(row=9, column=3)
+        self.sendMessageButton.grid(row=10, column=3)
 
         self.openProductButton = Button(
             self, text='Open product', command=self.open_product)
-        self.openProductButton.grid(row=12, column=0)
+        self.openProductButton.grid(row=13, column=0)
 
         self.createProductButton = Button(
             self, text='Create new product', command=lambda: controller.show_frame(CreateProduct))
-        self.createProductButton.grid(row=12, column=1)
+        self.createProductButton.grid(row=13, column=1)
 
-        Label(self, text="Products:").grid(row=10, columnspan=4)
+        Label(self, text="Products:").grid(row=11, columnspan=4)
 
         self.productList = Listbox(self)
-        self.productList.grid(row=11, columnspan=4)
+        self.productList.grid(row=12, columnspan=4)
 
         self.editProjectButton = Button(
             self, text='Edit Project', command=self.edit_project)
-        self.editProjectButton.grid(row=6, column=0,  columnspan = 4)
+        self.editProjectButton.grid(row=7, column=0,  columnspan = 4)
 
         self.backButton = Button(
             self, text='Back', command=lambda: controller.show_frame(Home))
-        self.backButton.grid(row=12, column=3)
+        self.backButton.grid(row=13, column=3)
 
     def open_product(self):
         selection = self.productList.curselection()
@@ -277,8 +295,7 @@ class Project(Frame):
         print("")
 
     def send_message(self):
-        message = dataAccess.Message(
-            app.currentUser.name, self.messageEntry.get(), str(datetime.now()))
+        message = dataAccess.Message(str(uuid.uuid1()), app.currentUser.name, self.messageEntry.get(), str(datetime.now()))
         dataAccess.send_message(self.project, message)
         self.project.messages.append(message)
         message_list = self.load_messages()
@@ -312,8 +329,62 @@ class Project(Frame):
         self.deadlineLabel.config(text=app.currentProject.deadline)
         self.descriptionLabel.config(text=app.currentProject.description)
         self.priorityLabel.config(text=app.currentProject.priority)
+        self.creatorLabel.config(text=app.currentProject.creator.name)
         self.budgetlabel.config(text=app.currentProject.budget)
 
+class CreateProject(Frame):
+    def __init__(self, parent, controller):
+        Frame.__init__(self, parent)
+
+        self.controller = controller
+
+        Label(self, text="Name of project: ").grid(row=0)
+        Label(self, text="Start time: ").grid(row=1)
+        Label(self, text="Deadline: ").grid(row=2,)
+        Label(self, text="Description: ").grid(row=3)
+        Label(self, text="Priority: ").grid(row=4)
+        Label(self, text="Budget: ").grid(row=5)
+
+        self.nameEntry = Entry(self, text="")
+        self.nameEntry.grid(row=0, column=1)
+        self.startTimeEntry = Entry(self, text="")
+        self.startTimeEntry.grid(row=1, column=1)
+        self.deadlineEntry = Entry(self, text="")
+        self.deadlineEntry.grid(row=2, column=1)
+        self.descriptionEntry = Entry(self, text="")
+        self.descriptionEntry.grid(row=3, column=1)
+        self.priorityEntry = Entry(self, text="")
+        self.priorityEntry.grid(row=4, column=1)
+        self.budgetEntry = Entry(self, text="")
+        self.budgetEntry.grid(row=5, column=1)
+
+        self.createProjectButton = Button(
+            self, text='Create Project', command=self.create_project)
+        self.createProjectButton.grid(row=6, column=0)
+
+        self.backButton = Button(
+            self, text='Back', command=lambda: controller.show_frame(Home))
+        self.backButton.grid(row=6, column=1)
+
+    def create_project(self):
+        project = dataAccess.Project(
+            str(uuid.uuid1()),
+            self.nameEntry.get(),
+            self.startTimeEntry.get(),
+            self.deadlineEntry.get(),
+            self.descriptionEntry.get(),
+            self.priorityEntry.get(),
+            self.budgetEntry.get(),
+            app.currentUser)
+        dataAccess.create_project(project)
+        self.nameEntry.insert(0, '')
+        self.startTimeEntry.insert(0, '')
+        self.deadlineEntry.insert(0, '')
+        self.descriptionEntry.insert(0, '')
+        self.priorityEntry.insert(0, '')
+        self.budgetEntry.insert(0, '')
+        self.controller.show_frame(Home)
+            
 class CreateProduct(Frame):
     def __init__(self, parent, controller):
         Frame.__init__(self, parent)
@@ -341,7 +412,7 @@ class CreateProduct(Frame):
 
     def create_product(self):
         product = dataAccess.Product(
-            self.nameEntry.get(), self.referenceEntry.get(), self.SupplierEntry.get())
+            str(uuid.uuid1()), self.nameEntry.get(), self.referenceEntry.get(), self.SupplierEntry.get())
         dataAccess.create_product(product, app.currentProject)
         self.nameEntry.insert(0, '')
         self.referenceEntry.insert(0, '')
@@ -373,6 +444,10 @@ class Product(Frame):
         self.supplierLabel.grid(row=2, column=1)
         self.statusLabel = Label(self, text="")
         self.statusLabel.grid(row=3, column=1)
+
+        self.editProduct = Button(
+            self, text='Edit Product', command=self.edit_product)
+        self.editProduct.grid(row=3, column=2)
 
         self.documentList = Listbox(self)
         self.documentList.grid(row=5, columnspan=2)
@@ -433,12 +508,15 @@ class Product(Frame):
             documents.append(document.name)
         return documents
 
+    def edit_product(self):
+        self.controller.open(EditProduct)
+
     def open_document(self):
         print()
     
     def send_message(self):
         message = dataAccess.Message(
-            app.currentUser.name, self.messageEntry.get(), str(datetime.now()))
+            str(uuid.uuid1()), app.currentUser.name, self.messageEntry.get(), str(datetime.now()))
         dataAccess.send_message(self.project, message, self.product)
         self.product.messages.append(message)
         message_list = self.load_messages()
@@ -481,7 +559,7 @@ class AddDocument(Frame):
 
     def add_document(self):
         if self.filepath != "" and self.nameEntry.get() != "":
-            document = dataAccess.Document(self.nameEntry.get(), self.filepath, str(datetime.now()))
+            document = dataAccess.Document(str(uuid.uuid1()), self.nameEntry.get(), self.filepath, str(datetime.now()))
             dataAccess.create_document(document, app.currentProduct, app.currentProject)
             self.controller.open(Product)
         if self.filepath == "" and self.nameEntry.get() != "":
@@ -491,6 +569,48 @@ class AddDocument(Frame):
         if self.filepath == "" and self.nameEntry.get() == "":
             messagebox.showerror("Error", "Please give a name to the Document, and select a file!")
             
+class EditProduct(Frame):
+    def __init__(self, parent, controller):
+        Frame.__init__(self, parent)
+
+        self.controller = controller
+        self.status = StringVar(self.master)
+        options = {"Created", "Concept", "Planning", "Development", "Qualification", "Launch"}
+
+        Label(self, text="Name of product: ").grid(row=0)
+        Label(self, text="Reference: ").grid(row=1)
+        Label(self, text="Supplier: ").grid(row=2)
+        Label(self, text="Status: ").grid(row=3)
+
+        self.nameEntry = Entry(self, text="")
+        self.nameEntry.grid(row=0, column=1)
+        self.referenceEntry = Entry(self, text="")
+        self.referenceEntry.grid(row=1, column=1)
+        self.SupplierEntry = Entry(self, text="")
+        self.SupplierEntry.grid(row=2, column=1)
+        self.statusOptionMenu = OptionMenu(self, self.status, *options)
+        self.statusOptionMenu.grid(row=3, column=1)
+
+        self.createProductButton = Button(
+            self, text='Edit product', command=self.edit_product)
+        self.createProductButton.grid(row=6, column=0)
+
+        self.backButton = Button(
+            self, text='Back', command=lambda: controller.show_frame(Project))
+        self.backButton.grid(row=6, column=1)
+
+    def edit_product(self):
+        product = dataAccess.Product(
+            app.currentProduct.id, self.nameEntry.get(), self.referenceEntry.get(), self.SupplierEntry.get(), self.status.get())
+        dataAccess.edit_product(product, app.currentProject)
+        self.controller.open(Project)
+
+    def update(self):
+        self.status = app.currentProduct.status
+        self.nameEntry.insert(0, app.currentProduct.name)
+        self.referenceEntry.insert(0, app.currentProduct.reference)
+        self.SupplierEntry.insert(0, app.currentProduct.supplier)
+
 
 
 app = App()
