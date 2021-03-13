@@ -6,6 +6,13 @@
       "email": "m@k.com",
       "password": "1234",
       "role": "Manufacturing"
+    },
+    {
+      "id": "3ca47810-83f3-11eb-84f7-a45e60c9f37b",
+      "name": "",
+      "email": "",
+      "password": "",
+      "role": "Client"
     }
   ]
 }

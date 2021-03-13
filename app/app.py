@@ -22,7 +22,7 @@ class App(Tk):
 
         self.frames = {}
 
-        for F in (StartPage, LogIn, SignUp, Home, Project, CreateProject, CreateProduct, Product, AddDocument, EditProduct):
+        for F in (StartPage, LogIn, SignUp, Home, Project, CreateProject, AddRole, CreateProduct, Product, AddDocument, EditProduct):
             frame = F(container, self)
             self.frames[F] = frame
             frame.grid(row=0, column=0, sticky="nsew")
@@ -37,10 +37,6 @@ class App(Tk):
         frame = self.frames[frame]
         frame.update()
         frame.tkraise()
-
-
-#    def request_access(self, project):
-
 
 class StartPage(Frame):
     def __init__(self, parent, controller):
@@ -277,7 +273,11 @@ class Project(Frame):
 
         self.editProjectButton = Button(
             self, text='Edit Project', command=self.edit_project)
-        self.editProjectButton.grid(row=7, column=0,  columnspan = 4)
+        self.editProjectButton.grid(row=7, column=0,  columnspan = 2)
+
+        self.addRoleButton = Button(
+            self, text='Add Role', command=lambda: controller.show_frame(AddRole))
+        self.addRoleButton.grid(row=7, column=2,  columnspan = 2)
 
         self.backButton = Button(
             self, text='Back', command=lambda: controller.show_frame(Home))
@@ -315,7 +315,7 @@ class Project(Frame):
         return products
 
     def update(self):
-        self.project = dataAccess.load_project(app.currentProject.name)
+        self.project = dataAccess.load_project(app.currentProject)
         message_list = self.load_messages()
         self.messageList.delete(0, 'end')
         self.messageList.insert("end", *message_list)
@@ -363,8 +363,11 @@ class CreateProject(Frame):
         self.createProjectButton.grid(row=6, column=0)
 
         self.backButton = Button(
-            self, text='Back', command=lambda: controller.show_frame(Home))
+            self, text='Back', command=self.open_home)
         self.backButton.grid(row=6, column=1)
+
+    def open_home(self):
+        self.controller.open(Home)
 
     def create_project(self):
         project = dataAccess.Project(
@@ -377,14 +380,59 @@ class CreateProject(Frame):
             self.budgetEntry.get(),
             app.currentUser)
         dataAccess.create_project(project)
+        dataAccess.add_role_to_project(dataAccess.Role(app.currentUser.id, app.currentUser.role), project)
         self.nameEntry.insert(0, '')
         self.startTimeEntry.insert(0, '')
         self.deadlineEntry.insert(0, '')
         self.descriptionEntry.insert(0, '')
         self.priorityEntry.insert(0, '')
         self.budgetEntry.insert(0, '')
-        self.controller.show_frame(Home)
-            
+        self.controller.open(Home)
+
+class AddRole(Frame):
+    def __init__(self, parent, controller):
+        Frame.__init__(self, parent)
+
+        self.controller = controller
+
+        options = {"Client", "Designer", "Customer Service", "Manufacturing"}
+
+        self.role = StringVar(self.master)
+        self.role.set("Client")
+
+        Label(self, text="Email of the user: ").grid(row=0)
+        Label(self, text="Role: ").grid(row=1)
+
+        self.emailEntry = Entry(self, text="")
+        self.emailEntry.grid(row=0, column=1)
+        self.roleOptionMenu = OptionMenu(self, self.role, *options)
+        self.roleOptionMenu.grid(row=1, column=1)
+
+        self.createProductButton = Button(
+            self, text='Add Role', command=self.add_role)
+        self.createProductButton.grid(row=6, column=0)
+
+        self.backButton = Button(
+            self, text='Back', command=lambda: controller.show_frame(Project))
+        self.backButton.grid(row=6, column=1)
+
+    def add_role(self):
+        users = dataAccess.load_users()
+        done = False
+        for user in users:
+            if user.email == self.emailEntry.get():
+                done = True
+                role = dataAccess.Role(user.id, self.role.get())
+                dataAccess.add_role_to_project(role, app.currentProject)
+                self.emailEntry.insert(0, '')
+                self.role.set("Client")
+                messagebox.showinfo(
+                        "Done", "You successfully added " + user.name + " as a " + self.role.get())
+                self.controller.open(Project)
+        if done is False:
+            messagebox.showerror(
+                        "Error", "There is no user with this email address: " + self.emailEntry.get())
+
 class CreateProduct(Frame):
     def __init__(self, parent, controller):
         Frame.__init__(self, parent)
@@ -476,7 +524,7 @@ class Product(Frame):
         self.backButton.grid(row=12, column=3)
 
     def update(self):
-        self.project = dataAccess.load_project(app.currentProject.name)
+        self.project = dataAccess.load_project(app.currentProject)
         for prod in self.project.products:
             if prod.reference == app.currentProduct.reference:
                 self.product = prod

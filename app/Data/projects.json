@@ -1,3 +1,69 @@
 {
-    "projects": []
+    "projects": [
+        {
+            "id": "eabc9c76-83ed-11eb-8d13-a45e60c9f37b",
+            "name": "1",
+            "start time": "1",
+            "deadline": "1",
+            "description": "1",
+            "priority": "1",
+            "creator": {
+                "id": "cbe10e8c-8324-11eb-91be-a45e60c9f37b",
+                "name": "Marcell Kegl",
+                "email": "m@k.com",
+                "password": "1234",
+                "role": "Manufacturing"
+            },
+            "budget": "1",
+            "messages": [],
+            "products": [],
+            "roles": [
+                {
+                    "userid": "cbe10e8c-8324-11eb-91be-a45e60c9f37b",
+                    "role": "Manufacturing"
+                }
+            ]
+        },
+        {
+            "id": "3338ae44-83ef-11eb-b7c3-a45e60c9f37b",
+            "name": "2",
+            "start time": "2",
+            "deadline": "2",
+            "description": "2",
+            "priority": "2",
+            "creator": {
+                "id": "cbe10e8c-8324-11eb-91be-a45e60c9f37b",
+                "name": "Marcell Kegl",
+                "email": "m@k.com",
+                "password": "1234",
+                "role": "Manufacturing"
+            },
+            "budget": "2",
+            "messages": [
+                {
+                    "id": "6233e7ea-83ef-11eb-b7c3-a45e60c9f37b",
+                    "sender": "Marcell Kegl",
+                    "message": "Message",
+                    "time": "2021-03-13 12:29:33.292405"
+                }
+            ],
+            "products": [
+                {
+                    "id": "70fb234c-83ef-11eb-b7c3-a45e60c9f37b",
+                    "name": "1",
+                    "reference": "2",
+                    "supplier": "3",
+                    "status": "Created",
+                    "documents": [],
+                    "messages": []
+                }
+            ],
+            "roles": [
+                {
+                    "userid": "cbe10e8c-8324-11eb-91be-a45e60c9f37b",
+                    "role": "Manufacturing"
+                }
+            ]
+        }
+    ]
 }
