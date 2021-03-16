@@ -161,6 +161,21 @@ def edit_product(product, project):
     with open("app/Data/projects.json", "w") as file:
         json.dump(data, file)
 
+def edit_project(project):
+    with open("app/Data/projects.json", "r") as file:
+        data = json.load(file)
+        for projidx, proj in enumerate(data["projects"]):
+            if proj["id"] == project.id:
+                data["projects"][projidx]["name"] = project.name
+                data["projects"][projidx]["start time"] = project.startTime
+                data["projects"][projidx]["description"] = project.description
+                data["projects"][projidx]["priority"] = project.priority
+                data["projects"][projidx]["deadline"] = project.deadline
+                data["projects"][projidx]["budget"] = project.budget
+
+    with open("app/Data/projects.json", "w") as file:
+        json.dump(data, file)
+
 def create_document(document, product, project):
     data_set = {
         "id": document.id,

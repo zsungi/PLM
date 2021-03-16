@@ -13,6 +13,8 @@ class App(Tk):
     def __init__(self, *args, **kwargs):
         Tk.__init__(self, *args, **kwargs)
         self.title("PLM")
+
+        self.geometry("%dx%d" % (285, 140))
         
         currentUser = None
         currentProject = None
@@ -25,7 +27,7 @@ class App(Tk):
 
         self.frames = {}
 
-        for F in (StartPage, LogIn, SignUp, Home, Project, CreateProject, AddRole, CreateProduct, Product, AddDocument, EditProduct):
+        for F in (StartPage, LogIn, SignUp, Home, Project, CreateProject, EditProject, AddRole, CreateProduct, Product, AddDocument, EditProduct):
             frame = F(container, self)
             self.frames[F] = frame
             frame.grid(row=0, column=0, sticky="nsew")
@@ -45,14 +47,25 @@ class StartPage(Frame):
     def __init__(self, parent, controller):
         Frame.__init__(self, parent)
 
+        self.controller = controller
+
         label = Label(self, text="Welcome")
         label.pack(padx=10, pady=10)
         login_page = Button(self, text="Log In",
-                            command=lambda: controller.show_frame(LogIn))
+                            command=self.log_in)
         login_page.pack()
         signup_page = Button(self, text="Sign Up",
-                             command=lambda: controller.show_frame(SignUp))
+                             command=self.sign_up)
         signup_page.pack()
+
+    def sign_up(self):
+        self.controller.open(SignUp)
+
+    def log_in(self):
+        self.controller.open(LogIn)
+
+    def update(self):
+        app.geometry("%dx%d" % (285, 140))
 
 class LogIn(Frame):
     def __init__(self, parent, controller):
@@ -74,7 +87,7 @@ class LogIn(Frame):
         self.logInButton.grid(row=3)
 
         self.backButton = Button(
-            self, text='Back', command=lambda: controller.show_frame(StartPage))
+            self, text='Back', command=self.start_page)
         self.backButton.grid(row=3, column=1)
 
     def log_in(self):
@@ -92,6 +105,12 @@ class LogIn(Frame):
         else:
             messagebox.showerror(
                 "Wrong email or password", "We dont have account with this email or your password is wrong, please try again or sign up if You do not have an account yet!")
+        
+    def update(self):
+        app.geometry("%dx%d" % (275, 90))
+
+    def start_page(self):
+        self.controller.open(StartPage)
 
 class SignUp(Frame):
     def __init__(self, parent, controller):
@@ -122,7 +141,7 @@ class SignUp(Frame):
         self.logInButton.grid(row=5)
 
         self.backButton = Button(
-            self, text='Back', command=lambda: controller.show_frame(StartPage))
+            self, text='Back', command=self.start_page)
         self.backButton.grid(row=5, column=1)
 
     def email_is_available(self, email):
@@ -132,6 +151,9 @@ class SignUp(Frame):
             if user.email == email:
                 available = False
         return available
+
+    def start_page(self):
+        self.controller.open(StartPage)
 
     def sign_up(self):
         if self.email_is_available(self.emailTextField.get()):
@@ -149,6 +171,9 @@ class SignUp(Frame):
             messagebox.showerror(
                 "Error", "This email is not available, we have a user with this email.")
 
+    def update(self):
+        app.geometry("%dx%d" % (285, 140))
+
 class Home(Frame):
     def __init__(self, parent, controller):
         Frame.__init__(self, parent)
@@ -157,31 +182,29 @@ class Home(Frame):
         self.projects = []
 
         self.nameLabel = Label(self, text="")
-        self.nameLabel.grid(row=0)
-        Label(self, text="Available projects:").grid(row=1)
+        self.nameLabel.grid(row=0, columnspan=3)
+        Label(self, text="Available projects:").grid(row=1, columnspan=4)
 
         self.logOutButton = Button(self, text='Log Out', command=self.log_out)
-        self.logOutButton.grid(row=0, column=1)
+        self.logOutButton.grid(row=0, column=3)
 
         self.projectsList = Listbox(self)
-        self.projectsList.grid(row=3)
+        self.projectsList.config(width=60)
+        self.projectsList.grid(row=3, columnspan=4)
 
         self.openProjectButton = Button(
             self, text='Open Project', command=self.open_project)
-        self.openProjectButton.grid(row=4, column=0)
-
-        self.requestAccessButton = Button(
-            self, text='Request Access', command=self.request_access)
-        self.requestAccessButton.grid(row=4, column=2)
+        self.openProjectButton.grid(row=4, column=0, columnspan=2)
 
         self.createProject = Button(
-            self, text='Create Project', command=lambda: controller.show_frame(CreateProject))
-        self.createProject.grid(row=4, column=1)
+            self, text='Create Project', command=self.create_project)
+        self.createProject.grid(row=4, column=2, columnspan=2)
 
     def log_out(self):
-        self.controller.show_frame(StartPage)
+        self.controller.open(StartPage)
 
     def update(self):
+        app.geometry("%dx%d" % (545, 255))
         self.projects = dataAccess.load_projects_for_user(app.currentUser)
         project_names = self.get_project_names(app.currentUser)
         self.nameLabel.config(text=app.currentUser.name)
@@ -203,7 +226,7 @@ class Home(Frame):
             messagebox.showerror("Error", "Select one project")
 
     def create_project(self):
-        self.controlle.open(CreateProject)
+        self.controller.open(CreateProject)
 
     def request_access(self):
         print()
@@ -246,16 +269,12 @@ class Project(Frame):
         self.budgetlabel.grid(row=6, column=2,  columnspan = 2)
 
         self.messageList = Listbox(self)
+        self.messageList.config(width=60)
         self.messageList.grid(row=9, columnspan=4)
 
         self.messageEntry = Entry(self)
-        self.messageEntry.insert(0, 'Message')
+        self.messageEntry.config(width=45)
         self.messageEntry.grid(row=10, column=0, columnspan = 3)
-        # Todo: make placeholder works
-        self.messageEntry.bind(
-            "<FocusIn>", self.messageEntry.delete("0", "end"))
-        self.messageEntry.bind(
-            "<FocusOut>", self.messageEntry.insert(0, "Message"))
 
         self.sendMessageButton = Button(
             self, text='Send', command=self.send_message)
@@ -263,15 +282,16 @@ class Project(Frame):
 
         self.openProductButton = Button(
             self, text='Open product', command=self.open_product)
-        self.openProductButton.grid(row=13, column=0)
+        self.openProductButton.grid(row=13, column=0, columnspan=2)
 
         self.createProductButton = Button(
-            self, text='Create new product', command=lambda: controller.show_frame(CreateProduct))
-        self.createProductButton.grid(row=13, column=1)
+            self, text='Create new product', command=self.create_product)
+        self.createProductButton.grid(row=13, column=2, columnspan=2)
 
         Label(self, text="Products:").grid(row=11, columnspan=4)
 
         self.productList = Listbox(self)
+        self.productList.config(width=60)
         self.productList.grid(row=12, columnspan=4)
 
         self.editProjectButton = Button(
@@ -279,17 +299,24 @@ class Project(Frame):
         self.editProjectButton.grid(row=7, column=0,  columnspan = 4)
 
         self.addRoleButton = Button(
-            self, text='Add Role', command=lambda: controller.show_frame(AddRole))
+            self, text='Add Role', command=self.add_role)
         self.addRoleButton.grid(row=16, column=0,  columnspan = 2)
 
         Label(self, text="Roles: ").grid(row=14, columnspan=4)
 
         self.roleList = Listbox(self)
+        self.roleList.config(width=60)
         self.roleList.grid(row=15, columnspan=4)
 
         self.backButton = Button(
-            self, text='Back', command=lambda: controller.show_frame(Home))
-        self.backButton.grid(row=16, column=3, columnspan=2)
+            self, text='Back', command=self.open_home)
+        self.backButton.grid(row=16, column=2, columnspan=2)
+
+    def open_home(self):
+        self.controller.open(Home)
+
+    def add_role(self):
+        self.controller.open(AddRole)
 
     def open_product(self):
         selection = self.productList.curselection()
@@ -300,7 +327,10 @@ class Project(Frame):
             messagebox.showerror("Error", "Select one product")
 
     def edit_project(self):
-        print("")
+        self.controller.open(EditProject)
+
+    def create_product(self):
+        self.controller.ope(CreateProduct)
 
     def send_message(self):
         message = dataAccess.Message(str(uuid.uuid1()), app.currentUser.name, self.messageEntry.get(), str(datetime.now()))
@@ -309,6 +339,7 @@ class Project(Frame):
         message_list = self.load_messages()
         self.messageList.delete(0, 'end')
         self.messageList.insert("end", *message_list)
+        self.messageEntry.delete(0, 'end')
 
     def load_messages(self):
         messages = []
@@ -329,10 +360,14 @@ class Project(Frame):
         return roles
 
     def update(self):
+        app.geometry("%dx%d" % (545, 850))
         self.project = dataAccess.load_project(app.currentProject)
         message_list = self.load_messages()
         self.messageList.delete(0, 'end')
         self.messageList.insert("end", *message_list)
+
+        self.messageEntry.delete(0, 'end')
+        self.messageEntry.insert(0, 'Message')
 
         self.product_list = self.load_products()
         self.productList.delete(0, 'end')
@@ -349,6 +384,62 @@ class Project(Frame):
         self.priorityLabel.config(text=app.currentProject.priority)
         self.creatorLabel.config(text=app.currentProject.creator.name)
         self.budgetlabel.config(text=app.currentProject.budget)
+
+class EditProject(Frame):
+    def __init__(self, parent, controller):
+        Frame.__init__(self, parent)
+
+        self.controller = controller
+
+        Label(self, text="Name of project: ").grid(row=0)
+        Label(self, text="Start time: ").grid(row=1)
+        Label(self, text="Deadline: ").grid(row=2,)
+        Label(self, text="Description: ").grid(row=3)
+        Label(self, text="Priority: ").grid(row=4)
+        Label(self, text="Budget: ").grid(row=5)
+
+        self.nameEntry = Entry(self, text="")
+        self.nameEntry.grid(row=0, column=1)
+        self.startTimeEntry = Entry(self, text="")
+        self.startTimeEntry.grid(row=1, column=1)
+        self.deadlineEntry = Entry(self, text="")
+        self.deadlineEntry.grid(row=2, column=1)
+        self.descriptionEntry = Entry(self, text="")
+        self.descriptionEntry.grid(row=3, column=1)
+        self.priorityEntry = Entry(self, text="")
+        self.priorityEntry.grid(row=4, column=1)
+        self.budgetEntry = Entry(self, text="")
+        self.budgetEntry.grid(row=5, column=1)
+
+        self.createProjectButton = Button(
+            self, text='Save', command=self.save_project)
+        self.createProjectButton.grid(row=6, column=0)
+
+        self.backButton = Button(
+            self, text='Back', command=self.back)
+        self.backButton.grid(row=6, column=1)
+
+    def back(self):
+        self.controller.open(Project)
+
+    def update(self):
+        app.geometry("%dx%d" % (325, 190))
+
+    def save_project(self):
+        app.currentProject.name = self.nameEntry.get()
+        app.currentProject.startTime = self.startTimeEntry.get()
+        app.currentProject.deadline = self.deadlineEntry.get()
+        app.currentProject.description = self.descriptionEntry.get()
+        app.currentProject.priority = self.priorityEntry.get()
+        app.currentProject.budget = self.budgetEntry.get()
+        dataAccess.edit_project(app.currentProject)
+        self.nameEntry.delete(0, 'end')
+        self.startTimeEntry.delete(0, 'end')
+        self.deadlineEntry.delete(0, 'end')
+        self.descriptionEntry.delete(0, 'end')
+        self.priorityEntry.delete(0, 'end')
+        self.budgetEntry.delete(0, 'end')
+        self.controller.open(Project)
 
 class CreateProject(Frame):
     def __init__(self, parent, controller):
@@ -387,6 +478,9 @@ class CreateProject(Frame):
     def open_home(self):
         self.controller.open(Home)
 
+    def update(self):
+        app.geometry("%dx%d" % (325, 200))
+
     def create_project(self):
         project = dataAccess.Project(
             str(uuid.uuid1()),
@@ -399,12 +493,12 @@ class CreateProject(Frame):
             app.currentUser)
         dataAccess.create_project(project)
         dataAccess.add_role_to_project(dataAccess.Role(app.currentUser.id, app.currentUser.name, app.currentUser.role), project)
-        self.nameEntry.insert(0, '')
-        self.startTimeEntry.insert(0, '')
-        self.deadlineEntry.insert(0, '')
-        self.descriptionEntry.insert(0, '')
-        self.priorityEntry.insert(0, '')
-        self.budgetEntry.insert(0, '')
+        self.nameEntry.delete(0, 'end')
+        self.startTimeEntry.delete(0, 'end')
+        self.deadlineEntry.delete(0, 'end')
+        self.descriptionEntry.delete(0, 'end')
+        self.priorityEntry.delete(0, 'end')
+        self.budgetEntry.delete(0, 'end')
         self.controller.open(Home)
 
 class AddRole(Frame):
@@ -419,7 +513,7 @@ class AddRole(Frame):
         self.role.set("Client")
 
         Label(self, text="Email of the user: ").grid(row=0)
-        Label(self, text="Role: ").grid(row=1)
+        #Label(self, text="Role: ").grid(row=1)
 
         self.emailEntry = Entry(self, text="")
         self.emailEntry.grid(row=0, column=1)
@@ -431,8 +525,14 @@ class AddRole(Frame):
         self.createProductButton.grid(row=6, column=0)
 
         self.backButton = Button(
-            self, text='Back', command=lambda: controller.show_frame(Project))
+            self, text='Back', command=self.back)
         self.backButton.grid(row=6, column=1)
+
+    def back(self):
+        self.controller.open(Project)
+
+    def update(self):
+        app.geometry("%dx%d" % (300, 60))
 
     def add_role(self):
         users = dataAccess.load_users()
@@ -442,7 +542,7 @@ class AddRole(Frame):
                 done = True
                 role = dataAccess.Role(user.id, user.name, user.role)
                 dataAccess.add_role_to_project(role, app.currentProject)
-                self.emailEntry.insert(0, '')
+                self.emailEntry.delete(0, 'end')
                 self.role.set("Client")
                 messagebox.showinfo(
                         "Done", "You successfully added " + user.name + " as a " + user.role)
@@ -480,10 +580,13 @@ class CreateProduct(Frame):
         product = dataAccess.Product(
             str(uuid.uuid1()), self.nameEntry.get(), self.referenceEntry.get(), self.SupplierEntry.get())
         dataAccess.create_product(product, app.currentProject)
-        self.nameEntry.insert(0, '')
-        self.referenceEntry.insert(0, '')
-        self.SupplierEntry.insert(0, '')
+        self.nameEntry.delete(0, 'end')
+        self.referenceEntry.delete(0, 'end')
+        self.SupplierEntry.delete(0, 'end')
         self.controller.open(Project)
+
+    def updade(self):
+        app.geometry("%dx%d" % (285, 140))
 
 class Product(Frame):
     def __init__(self, parent, controller):
@@ -494,54 +597,62 @@ class Product(Frame):
         self.document_list = []
         self.controller = controller
 
-        Label(self, text="Name of product: ").grid(row=0)
-        Label(self, text="Reference: ").grid(row=1)
-        Label(self, text="Supplier: ").grid(row=2)
-        Label(self, text="Status: ").grid(row=3)
-        Label(self, text="Documents: ").grid(row=4, columnspan=2)
-        Label(self, text="Messages: ").grid(row=7, columnspan=2)
-
+        Label(self, text="Name of product: ").grid(row=0, columnspan=2)
+        Label(self, text="Reference: ").grid(row=1, columnspan=2)
+        Label(self, text="Supplier: ").grid(row=2, columnspan=2)
+        Label(self, text="Status: ").grid(row=3, columnspan=2)
+        Label(self, text="Documents: ").grid(row=5, columnspan=4)
+        Label(self, text="Messages: ").grid(row=8, columnspan=4)
 
         self.nameLabel = Label(self, text="")
-        self.nameLabel.grid(row=0, column=1)
+        self.nameLabel.grid(row=0, column=2, columnspan=2)
         self.referenceLabel = Label(self, text="")
-        self.referenceLabel.grid(row=1, column=1)
+        self.referenceLabel.grid(row=1, column=2, columnspan=2)
         self.supplierLabel = Label(self, text="")
-        self.supplierLabel.grid(row=2, column=1)
+        self.supplierLabel.grid(row=2, column=2, columnspan=2)
         self.statusLabel = Label(self, text="")
-        self.statusLabel.grid(row=3, column=1)
+        self.statusLabel.grid(row=3, column=2, columnspan=2)
 
         self.editProduct = Button(
             self, text='Edit Product', command=self.edit_product)
-        self.editProduct.grid(row=3, column=2)
+        self.editProduct.grid(row=4, column=0, columnspan=4)
 
         self.documentList = Listbox(self)
-        self.documentList.grid(row=5, columnspan=2)
+        self.documentList.config(width=60)
+        self.documentList.grid(row=6, columnspan=4)
 
         self.messageList = Listbox(self)
-        self.messageList.grid(row=8, columnspan=2)
+        self.messageList.config(width=60)
+        self.messageList.grid(row=9, columnspan=4)
 
         self.addDocumentButton = Button(
-            self, text='Add Document', command=lambda: controller.show_frame(AddDocument))
-        self.addDocumentButton.grid(row=6, column=0)
+            self, text='Add Document', command=self.add_document)
+        self.addDocumentButton.grid(row=7, column=0, columnspan=2)
 
         self.openDocumentButton = Button(
             self, text='Open Document', command=self.open_document)
-        self.openDocumentButton.grid(row=6, column=1)
+        self.openDocumentButton.grid(row=7, column=2, columnspan=2)
 
         self.messageEntry = Entry(self)
-        self.messageEntry.insert(0, 'Message')
-        self.messageEntry.grid(row=9, column=0)
+        self.messageEntry.config(width=45)
+        self.messageEntry.grid(row=10, column=0, columnspan=3)
 
         self.sendMessageButton = Button(
             self, text='Send', command=self.send_message)
-        self.sendMessageButton.grid(row=9, column=1)
+        self.sendMessageButton.grid(row=10, column=3)
 
         self.backButton = Button(
-            self, text='Back', command=lambda: controller.show_frame(Project))
-        self.backButton.grid(row=12, column=3)
+            self, text='Back', command=self.back)
+        self.backButton.grid(row=11, column=3)
+
+    def back(self):
+        self.controller.open(Project)
+
+    def add_document(self):
+        self.controller.open(AddDocument)
 
     def update(self):
+        app.geometry("%dx%d" % (545, 600))
         self.project = dataAccess.load_project(app.currentProject)
         for prod in self.project.products:
             if prod.reference == app.currentProduct.reference:
@@ -603,6 +714,7 @@ class Product(Frame):
         dataAccess.send_message(self.project, message, self.product)
         self.product.messages.append(message)
         message_list = self.load_messages()
+        self.messageEntry.delete(0, 'end')
         self.messageList.delete(0, 'end')
         self.messageList.insert("end", *message_list)
 
@@ -633,8 +745,11 @@ class EditProduct(Frame):
         self.createProductButton.grid(row=6, column=0)
 
         self.backButton = Button(
-            self, text='Back', command=lambda: controller.show_frame(Project))
+            self, text='Back', command=self.back)
         self.backButton.grid(row=6, column=1)
+
+    def back(self):
+        self.controller.open(Product)
 
     def edit_product(self):
         product = dataAccess.Product(
@@ -643,7 +758,11 @@ class EditProduct(Frame):
         self.controller.open(Project)
 
     def update(self):
+        app.geometry("%dx%d" % (300, 140))
         self.status.set(app.currentProduct.status)
+        self.nameEntry.delete(0, 'end')
+        self.referenceEntry.delete(0, 'end')
+        self.SupplierEntry.delete(0, 'end')
         self.nameEntry.insert(0, app.currentProduct.name)
         self.referenceEntry.insert(0, app.currentProduct.reference)
         self.SupplierEntry.insert(0, app.currentProduct.supplier)
@@ -657,6 +776,7 @@ class AddDocument(Frame):
 
         Label(self, text="Name of document: ").grid(row=0)
         self.nameEntry = Entry(self, text="")
+        self.nameEntry.config(width=35)
         self.nameEntry.grid(row=0, column=1, columnspan = 2)
 
         Label(self, text="Selected file: ").grid(row=1)
@@ -672,8 +792,14 @@ class AddDocument(Frame):
         self.browseButton.grid(row=2, column=0)
 
         self.backButton = Button(
-            self, text='Back', command=lambda: controller.show_frame(Product))
+            self, text='Back', command=self.back)
         self.backButton.grid(row=2, column=2)
+
+    def back(self):
+        self.controller.open(Product)
+
+    def update(self):
+        app.geometry("%dx%d" % (470, 90))
 
     def browse(self):
         self.filepath = filedialog.askopenfilename(initialdir = "/", title = "Select a File")
@@ -686,6 +812,8 @@ class AddDocument(Frame):
             document = dataAccess.Document(uid, self.nameEntry.get(), os.getcwd() + "/app/Documents/" + uid + file_extension, file_extension, str(datetime.now()))
             dataAccess.create_document(document, app.currentProduct, app.currentProject)
             copyfile(self.filepath, os.getcwd() + "/app/Documents/" + document.id + file_extension)
+            self.nameEntry.delete(1, 'end')
+            self.pathLabel.config(text="")
             self.controller.open(Product)
         if self.filepath == "" and self.nameEntry.get() != "":
             messagebox.showerror("Error", "Please select a file!")
@@ -695,8 +823,6 @@ class AddDocument(Frame):
             messagebox.showerror("Error", "Please give a name to the Document, and select a file!")
         if self.filepath != "" and self.nameEntry.get() != "" and file_extension != ".jpg" and file_extension != ".txt":
             messagebox.showerror("Error", "Please select a file with .txt or .jpg extension!")
-
-
 
 
 app = App()

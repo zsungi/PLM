@@ -1,1 +1,180 @@
-{"projects": [{"id": "eabc9c76-83ed-11eb-8d13-a45e60c9f37b", "name": "1", "start time": "1", "deadline": "1", "description": "1", "priority": "1", "creator": {"id": "cbe10e8c-8324-11eb-91be-a45e60c9f37b", "name": "Marcell Kegl", "email": "m@k.com", "password": "1234", "role": "Manufacturing"}, "budget": "1", "messages": [], "products": [{"id": "3acba364-83f9-11eb-8c2f-a45e60c9f37b", "name": "1", "reference": "1", "supplier": "1", "status": "Created", "documents": [{"id": "4b4052c2-863c-11eb-8f1e-a45e60c9f37b", "name": "3", "file": "/Users/keglmarcell/Desktop/ESILV/PLM-1/app/Documents/4b4052c2-863c-11eb-8f1e-a45e60c9f37b.txt", "type": ".txt", "last modified": "2021-03-16 10:45:08.359998"}, {"id": "976cc400-863c-11eb-abd5-a45e60c9f37b", "name": "1", "file": "/Users/keglmarcell/Desktop/ESILV/PLM-1/app/Documents/976cc400-863c-11eb-abd5-a45e60c9f37b.jpg", "type": ".jpg", "last modified": "2021-03-16 10:47:16.158164"}, {"id": "ee578890-863c-11eb-bf5a-a45e60c9f37b", "name": "5", "file": "/Users/keglmarcell/Desktop/ESILV/PLM-1/app/Documents/ee578890-863c-11eb-bf5a-a45e60c9f37b.jpg", "type": ".jpg", "last modified": "2021-03-16 10:49:41.980800"}], "messages": []}], "roles": [{"userid": "cbe10e8c-8324-11eb-91be-a45e60c9f37b", "name": "Marcell Kegl", "role": "Manufacturing"}]}, {"id": "3338ae44-83ef-11eb-b7c3-a45e60c9f37b", "name": "2", "start time": "2", "deadline": "2", "description": "2", "priority": "2", "creator": {"id": "cbe10e8c-8324-11eb-91be-a45e60c9f37b", "name": "Marcell Kegl", "email": "m@k.com", "password": "1234", "role": "Manufacturing"}, "budget": "2", "messages": [{"id": "6233e7ea-83ef-11eb-b7c3-a45e60c9f37b", "sender": "Marcell Kegl", "message": "Message", "time": "2021-03-13 12:29:33.292405"}], "products": [{"id": "70fb234c-83ef-11eb-b7c3-a45e60c9f37b", "name": "1", "reference": "2", "supplier": "3", "status": "Created", "documents": [], "messages": []}], "roles": [{"userid": "cbe10e8c-8324-11eb-91be-a45e60c9f37b", "name": "Marcell Kegl", "role": "Manufacturing"}]}]}
+{
+    "projects": [
+        {
+            "id": "eabc9c76-83ed-11eb-8d13-a45e60c9f37b",
+            "name": "1",
+            "start time": "1",
+            "deadline": "1",
+            "description": "1",
+            "priority": "1",
+            "creator": {
+                "id": "cbe10e8c-8324-11eb-91be-a45e60c9f37b",
+                "name": "Marcell Kegl",
+                "email": "m@k.com",
+                "password": "1234",
+                "role": "Manufacturing"
+            },
+            "budget": "1",
+            "messages": [
+                {
+                    "id": "dc5e56e6-8646-11eb-9a65-a45e60c9f37b",
+                    "sender": "Marcell Kegl",
+                    "message": "Message",
+                    "time": "2021-03-16 12:00:46.793576"
+                },
+                {
+                    "id": "ccf984c2-8660-11eb-bde3-a45e60c9f37b",
+                    "sender": "Marcell Kegl",
+                    "message": "hi",
+                    "time": "2021-03-16 15:06:27.882043"
+                }
+            ],
+            "products": [
+                {
+                    "id": "3acba364-83f9-11eb-8c2f-a45e60c9f37b",
+                    "name": "1",
+                    "reference": "1",
+                    "supplier": "1",
+                    "status": "Created",
+                    "documents": [
+                        {
+                            "id": "4b4052c2-863c-11eb-8f1e-a45e60c9f37b",
+                            "name": "3",
+                            "file": "/Users/keglmarcell/Desktop/ESILV/PLM-1/app/Documents/4b4052c2-863c-11eb-8f1e-a45e60c9f37b.txt",
+                            "type": ".txt",
+                            "last modified": "2021-03-16 10:45:08.359998"
+                        },
+                        {
+                            "id": "976cc400-863c-11eb-abd5-a45e60c9f37b",
+                            "name": "1",
+                            "file": "/Users/keglmarcell/Desktop/ESILV/PLM-1/app/Documents/976cc400-863c-11eb-abd5-a45e60c9f37b.jpg",
+                            "type": ".jpg",
+                            "last modified": "2021-03-16 10:47:16.158164"
+                        },
+                        {
+                            "id": "ee578890-863c-11eb-bf5a-a45e60c9f37b",
+                            "name": "5",
+                            "file": "/Users/keglmarcell/Desktop/ESILV/PLM-1/app/Documents/ee578890-863c-11eb-bf5a-a45e60c9f37b.jpg",
+                            "type": ".jpg",
+                            "last modified": "2021-03-16 10:49:41.980800"
+                        }
+                    ],
+                    "messages": []
+                },
+                {
+                    "id": "d3b5a904-8646-11eb-9a65-a45e60c9f37b",
+                    "name": "sdsd",
+                    "reference": "dsss",
+                    "supplier": "dssa",
+                    "status": "Created",
+                    "documents": [
+                        {
+                            "id": "9a28ea42-8647-11eb-9a65-a45e60c9f37b",
+                            "name": "fsvsd",
+                            "file": "/Users/keglmarcell/Desktop/ESILV/PLM-1/app/Documents/9a28ea42-8647-11eb-9a65-a45e60c9f37b.jpg",
+                            "type": ".jpg",
+                            "last modified": "2021-03-16 12:06:05.210600"
+                        }
+                    ],
+                    "messages": [
+                        {
+                            "id": "d8ce3838-8660-11eb-bde3-a45e60c9f37b",
+                            "sender": "Marcell Kegl",
+                            "message": "Message",
+                            "time": "2021-03-16 15:06:47.730861"
+                        }
+                    ]
+                }
+            ],
+            "roles": [
+                {
+                    "userid": "cbe10e8c-8324-11eb-91be-a45e60c9f37b",
+                    "name": "Marcell Kegl",
+                    "role": "Manufacturing"
+                },
+                {
+                    "userid": "3ca47810-83f3-11eb-84f7-a45e60c9f37b",
+                    "name": "",
+                    "role": "Client"
+                }
+            ]
+        },
+        {
+            "id": "3338ae44-83ef-11eb-b7c3-a45e60c9f37b",
+            "name": "2",
+            "start time": "2",
+            "deadline": "2",
+            "description": "2",
+            "priority": "2",
+            "creator": {
+                "id": "cbe10e8c-8324-11eb-91be-a45e60c9f37b",
+                "name": "Marcell Kegl",
+                "email": "m@k.com",
+                "password": "1234",
+                "role": "Manufacturing"
+            },
+            "budget": "2",
+            "messages": [
+                {
+                    "id": "6233e7ea-83ef-11eb-b7c3-a45e60c9f37b",
+                    "sender": "Marcell Kegl",
+                    "message": "Message",
+                    "time": "2021-03-13 12:29:33.292405"
+                }
+            ],
+            "products": [
+                {
+                    "id": "70fb234c-83ef-11eb-b7c3-a45e60c9f37b",
+                    "name": "1",
+                    "reference": "2",
+                    "supplier": "3",
+                    "status": "Created",
+                    "documents": [],
+                    "messages": []
+                }
+            ],
+            "roles": [
+                {
+                    "userid": "cbe10e8c-8324-11eb-91be-a45e60c9f37b",
+                    "name": "Marcell Kegl",
+                    "role": "Manufacturing"
+                }
+            ]
+        },
+        {
+            "id": "cd81389c-864f-11eb-a61b-a45e60c9f37b",
+            "name": "5",
+            "start time": "3",
+            "deadline": "5",
+            "description": "5",
+            "priority": "5",
+            "creator": {
+                "id": "3ca47810-83f3-11eb-84f7-a45e60c9f37b",
+                "name": "",
+                "email": "",
+                "password": "",
+                "role": "Client"
+            },
+            "budget": "5",
+            "messages": [],
+            "products": [
+                {
+                    "id": "80456c5a-8650-11eb-a61b-a45e60c9f37b",
+                    "name": "2",
+                    "reference": "2",
+                    "supplier": "2",
+                    "status": "Created",
+                    "documents": [],
+                    "messages": []
+                }
+            ],
+            "roles": [
+                {
+                    "userid": "3ca47810-83f3-11eb-84f7-a45e60c9f37b",
+                    "name": "",
+                    "role": "Client"
+                }
+            ]
+        }
+    ]
+}
