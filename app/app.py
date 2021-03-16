@@ -276,15 +276,20 @@ class Project(Frame):
 
         self.editProjectButton = Button(
             self, text='Edit Project', command=self.edit_project)
-        self.editProjectButton.grid(row=7, column=0,  columnspan = 2)
+        self.editProjectButton.grid(row=7, column=0,  columnspan = 4)
 
         self.addRoleButton = Button(
             self, text='Add Role', command=lambda: controller.show_frame(AddRole))
-        self.addRoleButton.grid(row=7, column=2,  columnspan = 2)
+        self.addRoleButton.grid(row=16, column=0,  columnspan = 2)
+
+        Label(self, text="Roles: ").grid(row=14, columnspan=4)
+
+        self.roleList = Listbox(self)
+        self.roleList.grid(row=15, columnspan=4)
 
         self.backButton = Button(
             self, text='Back', command=lambda: controller.show_frame(Home))
-        self.backButton.grid(row=13, column=3)
+        self.backButton.grid(row=16, column=3, columnspan=2)
 
     def open_product(self):
         selection = self.productList.curselection()
@@ -317,6 +322,12 @@ class Project(Frame):
             products.append(product.name + " - " + product.reference)
         return products
 
+    def load_roles(self):
+        roles = []
+        for role in self.project.roles:
+            roles.append(role.name + " - " + role.role)
+        return roles
+
     def update(self):
         self.project = dataAccess.load_project(app.currentProject)
         message_list = self.load_messages()
@@ -326,6 +337,10 @@ class Project(Frame):
         self.product_list = self.load_products()
         self.productList.delete(0, 'end')
         self.productList.insert("end", *self.product_list)
+
+        role_list = self.load_roles()
+        self.roleList.delete(0, 'end')
+        self.roleList.insert("end", *role_list)
 
         self.nameLabel.config(text=app.currentProject.name)
         self.startTimeLabel.config(text=app.currentProject.startTime)
@@ -383,7 +398,7 @@ class CreateProject(Frame):
             self.budgetEntry.get(),
             app.currentUser)
         dataAccess.create_project(project)
-        dataAccess.add_role_to_project(dataAccess.Role(app.currentUser.id, app.currentUser.role), project)
+        dataAccess.add_role_to_project(dataAccess.Role(app.currentUser.id, app.currentUser.name, app.currentUser.role), project)
         self.nameEntry.insert(0, '')
         self.startTimeEntry.insert(0, '')
         self.deadlineEntry.insert(0, '')
@@ -409,7 +424,7 @@ class AddRole(Frame):
         self.emailEntry = Entry(self, text="")
         self.emailEntry.grid(row=0, column=1)
         self.roleOptionMenu = OptionMenu(self, self.role, *options)
-        self.roleOptionMenu.grid(row=1, column=1)
+        #self.roleOptionMenu.grid(row=1, column=1)
 
         self.createProductButton = Button(
             self, text='Add Role', command=self.add_role)
@@ -425,12 +440,12 @@ class AddRole(Frame):
         for user in users:
             if user.email == self.emailEntry.get():
                 done = True
-                role = dataAccess.Role(user.id, self.role.get())
+                role = dataAccess.Role(user.id, user.name, user.role)
                 dataAccess.add_role_to_project(role, app.currentProject)
                 self.emailEntry.insert(0, '')
                 self.role.set("Client")
                 messagebox.showinfo(
-                        "Done", "You successfully added " + user.name + " as a " + self.role.get())
+                        "Done", "You successfully added " + user.name + " as a " + user.role)
                 self.controller.open(Project)
         if done is False:
             messagebox.showerror(
@@ -566,12 +581,18 @@ class Product(Frame):
         selection = self.documentList.curselection()
         if len(selection) == 1:
             document = self.product.documents[selection[0]]
-            img = ImageTk.PhotoImage(Image.open(os.getcwd() + "/app/Documents/" + document.id + ".jpg"))
             newWindow = Toplevel(self.controller)
             newWindow.title(document.name)
-            imageLabel = Label(newWindow, image=img)
-            imageLabel.pack()
-            imageLabel.image = img
+            if document.type == ".jpg":
+                img = ImageTk.PhotoImage(Image.open(document.file))
+                label = Label(newWindow, image=img)
+                label.image = img
+            if document.type == ".txt":
+                f = open(document.file, "r")
+                txt = f.read()
+                label = Label(newWindow, text=txt)
+                label.text = txt
+            label.pack()
 
         else:
             messagebox.showerror("Error", "Select one Document")
@@ -659,11 +680,12 @@ class AddDocument(Frame):
         self.pathLabel.config(text=self.filepath)
 
     def add_document(self):
-        if self.filepath != "" and self.nameEntry.get() != "":
-            head_tail = os.path.split(self.filepath)
-            document = dataAccess.Document(str(uuid.uuid1()), self.nameEntry.get(), self.filepath, str(datetime.now()))
+        filename, file_extension = os.path.splitext(self.filepath)
+        if self.filepath != "" and self.nameEntry.get() != "" and (file_extension == ".jpg" or file_extension == ".txt"):
+            uid = str(uuid.uuid1()) 
+            document = dataAccess.Document(uid, self.nameEntry.get(), os.getcwd() + "/app/Documents/" + uid + file_extension, file_extension, str(datetime.now()))
             dataAccess.create_document(document, app.currentProduct, app.currentProject)
-            copyfile(self.filepath, os.getcwd() + "/app/Documents/" + document.id + ".jpg")
+            copyfile(self.filepath, os.getcwd() + "/app/Documents/" + document.id + file_extension)
             self.controller.open(Product)
         if self.filepath == "" and self.nameEntry.get() != "":
             messagebox.showerror("Error", "Please select a file!")
@@ -671,6 +693,8 @@ class AddDocument(Frame):
             messagebox.showerror("Error", "Please give a name to the Document!")
         if self.filepath == "" and self.nameEntry.get() == "":
             messagebox.showerror("Error", "Please give a name to the Document, and select a file!")
+        if self.filepath != "" and self.nameEntry.get() != "" and file_extension != ".jpg" and file_extension != ".txt":
+            messagebox.showerror("Error", "Please select a file with .txt or .jpg extension!")
 
 
 

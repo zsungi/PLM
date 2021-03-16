@@ -25,7 +25,8 @@ class Product:
         self.messages = []
 
 class Document:
-    def __init__(self, ident, name, filepath, lastModified):
+    def __init__(self, ident, name, filepath, filetype, lastModified):
+        self.type = filetype
         self.id = ident
         self.name = name
         self.file = filepath
@@ -47,8 +48,9 @@ class Message:
         self.time = time
 
 class Role:
-    def __init__(self, userid, role):
+    def __init__(self, userid, name, role):
         self.userid = userid
+        self.name = name
         self.role = role
 
 
@@ -112,6 +114,7 @@ def create_project(project):
 def add_role_to_project(role, project):
     data_set = {
             "userid": role.userid,
+            "name": role.name,
             "role": role.role
         }
     with open("app/Data/projects.json", "r") as file:
@@ -163,6 +166,7 @@ def create_document(document, product, project):
         "id": document.id,
         "name": document.name,
         "file": document.file,
+        "type": document.type,
         "last modified": document.lastModified
     }
 
@@ -203,11 +207,11 @@ def load_projects():
                 project.messages.append(
                     Message(message["id"], message["sender"], message["message"], message["time"]))
             for role in element["roles"]:
-                project.roles.append(Role(role["userid"], role["role"]))
+                project.roles.append(Role(role["userid"], role["name"], role["role"]))
             for product in element["products"]:
                 temp = Product(product["id"], product["name"], product["reference"], product["supplier"], product["status"])
                 for document in product["documents"]:
-                    temp.documents.append(Document(document["id"], document["name"], document["file"], document["last modified"]))
+                    temp.documents.append(Document(document["id"], document["name"], document["file"], document["type"], document["last modified"]))
                 for message in product["messages"]:
                     temp.messages.append(Message(message["id"], message["sender"], message["message"], message["time"]))
                 project.products.append(temp)
@@ -239,11 +243,11 @@ def load_project(project):
                     project.messages.append(
                         Message(message["id"], message["sender"], message["message"], message["time"]))
                 for role in element["roles"]:
-                    project.roles.append(Role(role["userid"], role["role"]))
+                    project.roles.append(Role(role["userid"], role["name"], role["role"]))
                 for product in element["products"]:
                     temp = Product(product["id"], product["name"], product["reference"], product["supplier"], product["status"])
                     for document in product["documents"]:
-                        temp.documents.append(Document(document["id"], document["name"], document["file"], document["last modified"]))
+                        temp.documents.append(Document(document["id"], document["name"], document["file"], document["type"], document["last modified"]))
                     for message in product["messages"]:
                         temp.messages.append(Message(message["id"], message["sender"], message["message"], message["time"]))
                     project.products.append(temp)
@@ -275,13 +279,13 @@ def load_projects_for_user(user):
                 project.messages.append(
                     Message(message["id"], message["sender"], message["message"], message["time"]))
             for role in element["roles"]:
-                project.roles.append(Role(role["userid"], role["role"]))
+                project.roles.append(Role(role["userid"], role["name"], role["role"]))
                 if role["userid"] == user.id:
                     access = True
             for product in element["products"]:
                 temp = Product(product["id"], product["name"], product["reference"], product["supplier"], product["status"])
                 for document in product["documents"]:
-                    temp.documents.append(Document(document["id"], document["name"], document["file"], document["last modified"]))
+                    temp.documents.append(Document(document["id"], document["name"], document["file"], document["type"], document["last modified"]))
                 for message in product["messages"]:
                     temp.messages.append(Message(message["id"], message["sender"], message["message"], message["time"]))
                 project.products.append(temp)
