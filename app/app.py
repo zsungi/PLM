@@ -27,7 +27,7 @@ class App(Tk):
 
         self.frames = {}
 
-        for F in (StartPage, LogIn, SignUp, Home, Project, CreateProject, EditProject, AddRole, CreateProduct, Product, AddDocument, EditProduct):
+        for F in (StartPage, LogIn, SignUp, Home, Project, CreateProject, EditProject, AddMember, CreateProduct, Product, AddDocument, EditProduct):
             frame = F(container, self)
             self.frames[F] = frame
             frame.grid(row=0, column=0, sticky="nsew")
@@ -299,7 +299,7 @@ class Project(Frame):
         self.editProjectButton.grid(row=7, column=0,  columnspan = 4)
 
         self.addRoleButton = Button(
-            self, text='Add Role', command=self.add_role)
+            self, text='Add Member to the Project', command=self.add_member)
         self.addRoleButton.grid(row=16, column=0,  columnspan = 2)
 
         Label(self, text="Roles: ").grid(row=14, columnspan=4)
@@ -315,8 +315,8 @@ class Project(Frame):
     def open_home(self):
         self.controller.open(Home)
 
-    def add_role(self):
-        self.controller.open(AddRole)
+    def add_member(self):
+        self.controller.open(AddMember)
 
     def open_product(self):
         selection = self.productList.curselection()
@@ -501,7 +501,7 @@ class CreateProject(Frame):
         self.budgetEntry.delete(0, 'end')
         self.controller.open(Home)
 
-class AddRole(Frame):
+class AddMember(Frame):
     def __init__(self, parent, controller):
         Frame.__init__(self, parent)
 
@@ -521,7 +521,7 @@ class AddRole(Frame):
         #self.roleOptionMenu.grid(row=1, column=1)
 
         self.createProductButton = Button(
-            self, text='Add Role', command=self.add_role)
+            self, text='Add Member', command=self.add_role)
         self.createProductButton.grid(row=6, column=0)
 
         self.backButton = Button(
@@ -535,19 +535,28 @@ class AddRole(Frame):
         app.geometry("%dx%d" % (300, 60))
 
     def add_role(self):
+        alreadyAdded = False
         users = dataAccess.load_users()
         done = False
-        for user in users:
-            if user.email == self.emailEntry.get():
-                done = True
-                role = dataAccess.Role(user.id, user.name, user.role)
-                dataAccess.add_role_to_project(role, app.currentProject)
-                self.emailEntry.delete(0, 'end')
-                self.role.set("Client")
-                messagebox.showinfo(
-                        "Done", "You successfully added " + user.name + " as a " + user.role)
-                self.controller.open(Project)
-        if done is False:
+        for role in app.currentProject.roles:
+            for user in users:
+                if user.id == role.userid and user.email == self.emailEntry.get():
+                    alreadyAdded = True
+                    messagebox.showerror(
+                            "Error", "This user is already added as a member to this Project" + self.emailEntry.get())
+
+        if alreadyAdded is not True:
+            for user in users:
+                if user.email == self.emailEntry.get():
+                    done = True
+                    role = dataAccess.Role(user.id, user.name, user.role)
+                    dataAccess.add_role_to_project(role, app.currentProject)
+                    self.emailEntry.delete(0, 'end')
+                    self.role.set("Client")
+                    messagebox.showinfo(
+                            "Done", "You successfully added " + user.name + " as a " + user.role)
+                    self.controller.open(Project)
+        if done == False and alreadyAdded == False:
             messagebox.showerror(
                         "Error", "There is no user with this email address: " + self.emailEntry.get())
 
