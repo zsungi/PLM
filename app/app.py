@@ -99,8 +99,8 @@ class LogIn(Frame):
                 app.currentUser = u
 
         if app.currentUser is not None:
-            self.emailTextField.insert(0, '')
-            self.passwordTextField.insert(0, '')
+            self.passwordTextField.delete(0, 'end')
+            self.emailTextField.delete(0, 'end')
             self.controller.open(Home)
         else:
             messagebox.showerror(
@@ -162,9 +162,9 @@ class SignUp(Frame):
             dataAccess.add_user(app.currentUser)
             messagebox.showinfo(
                 "Welcome", "You successfully signed up, Welcome")
-            self.nameTextField.insert(0, '')
-            self.emailTextField.insert(0, '')
-            self.passwordTextField.insert(0, '')
+            self.passwordTextField.delete(0, 'end')
+            self.emailTextField.delete(0, 'end')
+            self.nameTextField.delete(0, 'end')
             self.role.set("Client")
             self.controller.open(Home)
         else:
