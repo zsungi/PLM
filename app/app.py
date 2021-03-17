@@ -1,7 +1,7 @@
 from tkinter import *
 from tkinter import messagebox
 from tkinter import filedialog
-from PIL import Image, ImageTk
+#from PIL import Image, ImageTk
 import dataAccess
 import os
 from datetime import datetime
@@ -15,7 +15,7 @@ class App(Tk):
         self.title("PLM")
 
         self.geometry("%dx%d" % (285, 140))
-        
+
         currentUser = None
         currentProject = None
         currentProduct = None
@@ -43,6 +43,7 @@ class App(Tk):
         frame.update()
         frame.tkraise()
 
+
 class StartPage(Frame):
     def __init__(self, parent, controller):
         Frame.__init__(self, parent)
@@ -66,6 +67,7 @@ class StartPage(Frame):
 
     def update(self):
         app.geometry("%dx%d" % (285, 140))
+
 
 class LogIn(Frame):
     def __init__(self, parent, controller):
@@ -105,12 +107,13 @@ class LogIn(Frame):
         else:
             messagebox.showerror(
                 "Wrong email or password", "We dont have account with this email or your password is wrong, please try again or sign up if You do not have an account yet!")
-        
+
     def update(self):
         app.geometry("%dx%d" % (275, 90))
 
     def start_page(self):
         self.controller.open(StartPage)
+
 
 class SignUp(Frame):
     def __init__(self, parent, controller):
@@ -174,6 +177,7 @@ class SignUp(Frame):
     def update(self):
         app.geometry("%dx%d" % (285, 140))
 
+
 class Home(Frame):
     def __init__(self, parent, controller):
         Frame.__init__(self, parent)
@@ -230,11 +234,12 @@ class Home(Frame):
 
     def request_access(self):
         print()
-        #Todo:
-        #-add new key to project jsons: request
-        #-if you request add your request to this list
-        #-add new key to project json: creator
-        #if the creator log in show message dialog with the request to accept or deny            
+        # Todo:
+        # -add new key to project jsons: request
+        # -if you request add your request to this list
+        # -add new key to project json: creator
+        # if the creator log in show message dialog with the request to accept or deny
+
 
 class Project(Frame):
     def __init__(self, parent, controller):
@@ -244,29 +249,29 @@ class Project(Frame):
         self.controller = controller
         self.product_list = []
 
-        Label(self, text="Name of project: ").grid(row=0,  columnspan = 2)
-        Label(self, text="Start time: ").grid(row=1,  columnspan = 2)
-        Label(self, text="Deadline: ").grid(row=2,  columnspan = 2)
-        Label(self, text="Description: ").grid(row=3,  columnspan = 2)
-        Label(self, text="Priority: ").grid(row=4,  columnspan = 2)
-        Label(self, text="Creator: ").grid(row=5,  columnspan = 2)
-        Label(self, text="Budget: ").grid(row=6,  columnspan = 2)
+        Label(self, text="Name of project: ").grid(row=0,  columnspan=2)
+        Label(self, text="Start time: ").grid(row=1,  columnspan=2)
+        Label(self, text="Deadline: ").grid(row=2,  columnspan=2)
+        Label(self, text="Description: ").grid(row=3,  columnspan=2)
+        Label(self, text="Priority: ").grid(row=4,  columnspan=2)
+        Label(self, text="Creator: ").grid(row=5,  columnspan=2)
+        Label(self, text="Budget: ").grid(row=6,  columnspan=2)
         Label(self, text="Messages: ").grid(row=8, columnspan=4)
 
         self.nameLabel = Label(self, text="")
-        self.nameLabel.grid(row=0, column=2,  columnspan = 2)
+        self.nameLabel.grid(row=0, column=2,  columnspan=2)
         self.startTimeLabel = Label(self, text="")
-        self.startTimeLabel.grid(row=1, column=2,  columnspan = 2)
+        self.startTimeLabel.grid(row=1, column=2,  columnspan=2)
         self.deadlineLabel = Label(self, text="")
-        self.deadlineLabel.grid(row=2, column=2,  columnspan = 2)
+        self.deadlineLabel.grid(row=2, column=2,  columnspan=2)
         self.descriptionLabel = Label(self, text="")
-        self.descriptionLabel.grid(row=3, column=2,  columnspan = 2)
+        self.descriptionLabel.grid(row=3, column=2,  columnspan=2)
         self.priorityLabel = Label(self, text="")
-        self.priorityLabel.grid(row=4, column=2,  columnspan = 2)
+        self.priorityLabel.grid(row=4, column=2,  columnspan=2)
         self.creatorLabel = Label(self, text="")
-        self.creatorLabel.grid(row=5, column=2,  columnspan = 2)
+        self.creatorLabel.grid(row=5, column=2,  columnspan=2)
         self.budgetlabel = Label(self, text="")
-        self.budgetlabel.grid(row=6, column=2,  columnspan = 2)
+        self.budgetlabel.grid(row=6, column=2,  columnspan=2)
 
         self.messageList = Listbox(self)
         self.messageList.config(width=60)
@@ -274,7 +279,7 @@ class Project(Frame):
 
         self.messageEntry = Entry(self)
         self.messageEntry.config(width=45)
-        self.messageEntry.grid(row=10, column=0, columnspan = 3)
+        self.messageEntry.grid(row=10, column=0, columnspan=3)
 
         self.sendMessageButton = Button(
             self, text='Send', command=self.send_message)
@@ -296,11 +301,11 @@ class Project(Frame):
 
         self.editProjectButton = Button(
             self, text='Edit Project', command=self.edit_project)
-        self.editProjectButton.grid(row=7, column=0,  columnspan = 4)
+        self.editProjectButton.grid(row=7, column=0,  columnspan=4)
 
         self.addRoleButton = Button(
             self, text='Add Role', command=self.add_role)
-        self.addRoleButton.grid(row=16, column=0,  columnspan = 2)
+        self.addRoleButton.grid(row=16, column=0,  columnspan=2)
 
         Label(self, text="Roles: ").grid(row=14, columnspan=4)
 
@@ -330,10 +335,11 @@ class Project(Frame):
         self.controller.open(EditProject)
 
     def create_product(self):
-        self.controller.ope(CreateProduct)
+        self.controller.open(CreateProduct)
 
     def send_message(self):
-        message = dataAccess.Message(str(uuid.uuid1()), app.currentUser.name, self.messageEntry.get(), str(datetime.now()))
+        message = dataAccess.Message(str(
+            uuid.uuid1()), app.currentUser.name, self.messageEntry.get(), str(datetime.now()))
         dataAccess.send_message(self.project, message)
         self.project.messages.append(message)
         message_list = self.load_messages()
@@ -384,6 +390,7 @@ class Project(Frame):
         self.priorityLabel.config(text=app.currentProject.priority)
         self.creatorLabel.config(text=app.currentProject.creator.name)
         self.budgetlabel.config(text=app.currentProject.budget)
+
 
 class EditProject(Frame):
     def __init__(self, parent, controller):
@@ -441,6 +448,7 @@ class EditProject(Frame):
         self.budgetEntry.delete(0, 'end')
         self.controller.open(Project)
 
+
 class CreateProject(Frame):
     def __init__(self, parent, controller):
         Frame.__init__(self, parent)
@@ -492,7 +500,8 @@ class CreateProject(Frame):
             self.budgetEntry.get(),
             app.currentUser)
         dataAccess.create_project(project)
-        dataAccess.add_role_to_project(dataAccess.Role(app.currentUser.id, app.currentUser.name, app.currentUser.role), project)
+        dataAccess.add_role_to_project(dataAccess.Role(
+            app.currentUser.id, app.currentUser.name, app.currentUser.role), project)
         self.nameEntry.delete(0, 'end')
         self.startTimeEntry.delete(0, 'end')
         self.deadlineEntry.delete(0, 'end')
@@ -500,6 +509,7 @@ class CreateProject(Frame):
         self.priorityEntry.delete(0, 'end')
         self.budgetEntry.delete(0, 'end')
         self.controller.open(Home)
+
 
 class AddRole(Frame):
     def __init__(self, parent, controller):
@@ -545,11 +555,12 @@ class AddRole(Frame):
                 self.emailEntry.delete(0, 'end')
                 self.role.set("Client")
                 messagebox.showinfo(
-                        "Done", "You successfully added " + user.name + " as a " + user.role)
+                    "Done", "You successfully added " + user.name + " as a " + user.role)
                 self.controller.open(Project)
         if done is False:
             messagebox.showerror(
-                        "Error", "There is no user with this email address: " + self.emailEntry.get())
+                "Error", "There is no user with this email address: " + self.emailEntry.get())
+
 
 class CreateProduct(Frame):
     def __init__(self, parent, controller):
@@ -587,6 +598,7 @@ class CreateProduct(Frame):
 
     def updade(self):
         app.geometry("%dx%d" % (285, 140))
+
 
 class Product(Frame):
     def __init__(self, parent, controller):
@@ -707,7 +719,7 @@ class Product(Frame):
 
         else:
             messagebox.showerror("Error", "Select one Document")
-    
+
     def send_message(self):
         message = dataAccess.Message(
             str(uuid.uuid1()), app.currentUser.name, self.messageEntry.get(), str(datetime.now()))
@@ -718,13 +730,15 @@ class Product(Frame):
         self.messageList.delete(0, 'end')
         self.messageList.insert("end", *message_list)
 
+
 class EditProduct(Frame):
     def __init__(self, parent, controller):
         Frame.__init__(self, parent)
 
         self.controller = controller
         self.status = StringVar(self.master)
-        options = {"Created", "Concept", "Planning", "Development", "Qualification", "Launch"}
+        options = {"Created", "Concept", "Planning",
+                   "Development", "Qualification", "Launch"}
 
         Label(self, text="Name of product: ").grid(row=0)
         Label(self, text="Reference: ").grid(row=1)
@@ -767,6 +781,7 @@ class EditProduct(Frame):
         self.referenceEntry.insert(0, app.currentProduct.reference)
         self.SupplierEntry.insert(0, app.currentProduct.supplier)
 
+
 class AddDocument(Frame):
     def __init__(self, parent, controller):
         Frame.__init__(self, parent)
@@ -777,11 +792,11 @@ class AddDocument(Frame):
         Label(self, text="Name of document: ").grid(row=0)
         self.nameEntry = Entry(self, text="")
         self.nameEntry.config(width=35)
-        self.nameEntry.grid(row=0, column=1, columnspan = 2)
+        self.nameEntry.grid(row=0, column=1, columnspan=2)
 
         Label(self, text="Selected file: ").grid(row=1)
         self.pathLabel = Label(self, text="")
-        self.pathLabel.grid(row=1, column = 1, columnspan = 2)
+        self.pathLabel.grid(row=1, column=1, columnspan=2)
 
         self.addDocumentButton = Button(
             self, text='Add Document', command=self.add_document)
@@ -802,27 +817,34 @@ class AddDocument(Frame):
         app.geometry("%dx%d" % (470, 90))
 
     def browse(self):
-        self.filepath = filedialog.askopenfilename(initialdir = "/", title = "Select a File")
+        self.filepath = filedialog.askopenfilename(
+            initialdir="/", title="Select a File")
         self.pathLabel.config(text=self.filepath)
 
     def add_document(self):
         filename, file_extension = os.path.splitext(self.filepath)
         if self.filepath != "" and self.nameEntry.get() != "" and (file_extension == ".jpg" or file_extension == ".txt"):
-            uid = str(uuid.uuid1()) 
-            document = dataAccess.Document(uid, self.nameEntry.get(), os.getcwd() + "/app/Documents/" + uid + file_extension, file_extension, str(datetime.now()))
-            dataAccess.create_document(document, app.currentProduct, app.currentProject)
-            copyfile(self.filepath, os.getcwd() + "/app/Documents/" + document.id + file_extension)
+            uid = str(uuid.uuid1())
+            document = dataAccess.Document(uid, self.nameEntry.get(), os.getcwd(
+            ) + "/app/Documents/" + uid + file_extension, file_extension, str(datetime.now()))
+            dataAccess.create_document(
+                document, app.currentProduct, app.currentProject)
+            copyfile(self.filepath, os.getcwd() +
+                     "/app/Documents/" + document.id + file_extension)
             self.nameEntry.delete(1, 'end')
             self.pathLabel.config(text="")
             self.controller.open(Product)
         if self.filepath == "" and self.nameEntry.get() != "":
             messagebox.showerror("Error", "Please select a file!")
         if self.filepath != "" and self.nameEntry.get() == "":
-            messagebox.showerror("Error", "Please give a name to the Document!")
+            messagebox.showerror(
+                "Error", "Please give a name to the Document!")
         if self.filepath == "" and self.nameEntry.get() == "":
-            messagebox.showerror("Error", "Please give a name to the Document, and select a file!")
+            messagebox.showerror(
+                "Error", "Please give a name to the Document, and select a file!")
         if self.filepath != "" and self.nameEntry.get() != "" and file_extension != ".jpg" and file_extension != ".txt":
-            messagebox.showerror("Error", "Please select a file with .txt or .jpg extension!")
+            messagebox.showerror(
+                "Error", "Please select a file with .txt or .jpg extension!")
 
 
 app = App()
