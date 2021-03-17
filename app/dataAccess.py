@@ -15,7 +15,10 @@ class Project:
         self.roles = []
 
 class Product:
-    def __init__(self, ident, name, reference, supplier, status = "Created"):
+    BreechNum = 0
+    BreechSealNum = 0
+
+    def __init__(self, ident, name, reference, supplier, status="Created"):
         self.id = ident
         self.name = name
         self.reference = reference
@@ -23,6 +26,12 @@ class Product:
         self.status = status
         self.documents = []
         self.messages = []
+        if name == 'Breech':
+            self.reference = str(self.supplier) + '_00CU0'+str(self.BreechNum)+'0'
+            self.BreechNum += 1
+        if name == 'BreechSeal':
+            self.reference = str(self.supplier) + '_00JO0'+str(self.BreechSealNum)+'0'
+            self.BreechSealNum += 1
 
 class Document:
     def __init__(self, ident, name, filepath, filetype, lastModified):
