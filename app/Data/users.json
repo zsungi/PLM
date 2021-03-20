@@ -1,1 +1,53 @@
-{"users": [{"id": "cbe10e8c-8324-11eb-91be-a45e60c9f37b", "name": "Marcell Kegl", "email": "m@k.com", "password": "1234", "role": "Manufacturing"}, {"id": "3ca47810-83f3-11eb-84f7-a45e60c9f37b", "name": "", "email": "", "password": "", "role": "Client"}, {"id": "9f834c90-8718-11eb-ad8c-a45e60c9f37b", "name": "123", "email": "123", "password": "123", "role": "Client"}]}
+{
+  "users": [
+    {
+      "id": "cbe10e8c-8324-11eb-91be-a45e60c9f37b",
+      "name": "Marcell Kegl",
+      "email": "m@k.com",
+      "password": "1234",
+      "role": "Manufacturing"
+    },
+    {
+      "id": "245oo6-po22-1df5-666d-a45e60c9f37b",
+      "name": "Valentin Simon",
+      "email": "v@s.com",
+      "password": "1234",
+      "role": "Manufacturing"
+    },
+    {
+      "id": "m1256j24-6424-89yt-6g2g-a45e60c9f37b",
+      "name": "Antoine dOncieu",
+      "email": "a@d.com",
+      "password": "1234",
+      "role": "Manufacturing"
+    },
+    {
+      "id": "3ca47810-83f3-11eb-84f7-a45e60c9f37b",
+      "name": "Clark Kent",
+      "email": "superguy@gmail.com",
+      "password": "loislane",
+      "role": "Client"
+    },
+    {
+      "id": "9f834c90-8718-11eb-ad8c-a45e60c9f37b",
+      "name": "Bruce Wayne",
+      "email": "imbatman@gmail.com",
+      "password": "fbane",
+      "role": "Client"
+    },
+    {
+      "id": "65h21o00-12lm-1548-iio5-a45e60c9f37b",
+      "name": "Peter Parker",
+      "email": "webzz@gmail.com",
+      "password": "maylove",
+      "role": "Client"
+    },
+    {
+      "id": "hj698p-1vd5-444g-rt34-a45e60c9f37b",
+      "name": "Barry Allen",
+      "email": "zoom@gmail.com",
+      "password": "theflash",
+      "role": "Client"
+    }
+  ]
+}
