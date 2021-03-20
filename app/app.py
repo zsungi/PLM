@@ -226,15 +226,7 @@ class Home(Frame):
             messagebox.showerror("Error", "Select one project")
 
     def create_project(self):
-        self.controller.open(CreateProject)
-
-    def request_access(self):
-        print()
-        #Todo:
-        #-add new key to project jsons: request
-        #-if you request add your request to this list
-        #-add new key to project json: creator
-        #if the creator log in show message dialog with the request to accept or deny            
+        self.controller.open(CreateProject)        
 
 class Project(Frame):
     def __init__(self, parent, controller):
@@ -330,7 +322,7 @@ class Project(Frame):
         self.controller.open(EditProject)
 
     def create_product(self):
-        self.controller.ope(CreateProduct)
+        self.controller.open(CreateProduct)
 
     def send_message(self):
         message = dataAccess.Message(str(uuid.uuid1()), app.currentUser.name, self.messageEntry.get(), str(datetime.now()))
@@ -582,20 +574,38 @@ class CreateProduct(Frame):
         self.createProductButton.grid(row=6, column=0)
 
         self.backButton = Button(
-            self, text='Back', command=lambda: controller.show_frame(Project))
+            self, text='Back', command=self.back)
         self.backButton.grid(row=6, column=1)
 
-    def create_product(self):
-        product = dataAccess.Product(
-            str(uuid.uuid1()), self.nameEntry.get(), self.referenceEntry.get(), self.SupplierEntry.get())
-        dataAccess.create_product(product, app.currentProject)
-        self.nameEntry.delete(0, 'end')
-        self.referenceEntry.delete(0, 'end')
-        self.SupplierEntry.delete(0, 'end')
+    def back(self):
         self.controller.open(Project)
 
-    def updade(self):
-        app.geometry("%dx%d" % (285, 140))
+    def create_product(self):
+        if self.reference_is_valid(self.referenceEntry.get()):
+            product = dataAccess.Product(
+                str(uuid.uuid1()), self.nameEntry.get(), self.referenceEntry.get(), self.SupplierEntry.get())
+            dataAccess.create_product(product, app.currentProject)
+            self.nameEntry.delete(0, 'end')
+            self.referenceEntry.delete(0, 'end')
+            self.SupplierEntry.delete(0, 'end')
+            self.controller.open(Project)
+        else:
+            messagebox.showerror(
+                "Invalid reference", "Please use a reference where the last 3 characters ar Zeros ('000')!")
+
+
+    def update(self):
+        app.geometry("%dx%d" % (330, 115))
+
+    def reference_is_valid(self, reference):
+        """
+        Return True if the last 3 characters are 000
+        Else return False
+        """
+        valid = False
+        if reference[-3:] == "000":
+            valid = True
+        return valid
 
 class Product(Frame):
     def __init__(self, parent, controller):
@@ -624,7 +634,11 @@ class Product(Frame):
 
         self.editProduct = Button(
             self, text='Edit Product', command=self.edit_product)
-        self.editProduct.grid(row=4, column=0, columnspan=4)
+        self.editProduct.grid(row=4, column=0, columnspan=2)
+
+        self.NewVersionButton = Button(
+            self, text='Create new version', command=self.new_version)
+        self.NewVersionButton.grid(row=4, column=2, columnspan=2)
 
         self.documentList = Listbox(self)
         self.documentList.config(width=60)
@@ -697,6 +711,23 @@ class Product(Frame):
     def edit_product(self):
         self.controller.open(EditProduct)
 
+    def new_version(self):
+        MsgBox = messagebox.askquestion ('Create new version','Are you sure you want to create a new version of this product?',icon = 'warning')
+        if MsgBox == 'yes':
+            if app.currentProduct.reference[-3] == "0":
+                if app.currentProduct.reference[-2] == "9":
+                    referencenumber = "100"
+                else:
+                    referencenumber = "0" + str(int(app.currentProduct.reference[-2:]) + 10)
+            if app.currentProduct.reference[-3] != "0":
+                referencenumber = str(int(app.currentProduct.reference[-3:-2]) + 1) + "0"
+            reference = app.currentProduct.reference[:-3] + referencenumber
+            product = dataAccess.Product(
+                str(uuid.uuid1()), app.currentProduct.name, reference, app.currentProduct.supplier)
+            dataAccess.create_product(product, app.currentProject)
+            app.currentProduct = product
+            self.controller.open(Product)
+            
     def open_document(self):
         selection = self.documentList.curselection()
         if len(selection) == 1:
@@ -764,7 +795,7 @@ class EditProduct(Frame):
         product = dataAccess.Product(
             app.currentProduct.id, self.nameEntry.get(), self.referenceEntry.get(), self.SupplierEntry.get(), self.status.get())
         dataAccess.edit_product(product, app.currentProject)
-        self.controller.open(Project)
+        self.controller.open(Product)
 
     def update(self):
         app.geometry("%dx%d" % (300, 140))
