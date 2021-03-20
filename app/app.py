@@ -117,7 +117,16 @@ class SignUp(Frame):
         Frame.__init__(self, parent)
         self.controller = controller
 
-        options = {"Client", "Designer", "Customer Service", "Manufacturing"}
+        options = {
+            "Client",
+            "Designer",
+            "Customer Service",
+            "Manufacturing",
+            "Quality Control",
+            "Safety Control",
+            "Operation manager",
+            "Marketing"
+            }
 
         self.role = StringVar(self.master)
         self.role.set("Client")
