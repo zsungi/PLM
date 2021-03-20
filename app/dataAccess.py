@@ -1,4 +1,5 @@
 import json
+import os
 
 
 class Project:
@@ -29,11 +30,13 @@ class Product:
         self.documents = []
         self.messages = []
         if name == 'Breech':
+            self.reference = str(self.supplier) + \
+                '_00CU0'+str(self.BreechNum)+'0'
             self.BreechNum += 1
-            self.reference = 'PSA_00CU0'+str(self.BreechNum)+'0'
         if name == 'BreechSeal':
+            self.reference = str(self.supplier) + '_00JO0' + \
+                str(self.BreechSealNum)+'0'
             self.BreechSealNum += 1
-            self.reference = 'PSA_00CU0'+str(self.BreechSealNum)+'0'
 
 
 class Document:
@@ -78,17 +81,17 @@ def add_user(user):
         "role": user.role
     }
 
-    with open("app/Data/users.json", "r") as file:
+    with open(os.getcwd() + "/Data/users.json", "r") as file:
         data = json.load(file)
         data["users"].append(data_set)
 
-    with open("app/Data/users.json", "w") as file:
+    with open(os.getcwd() + "/Data/users.json", "w") as file:
         json.dump(data, file)
 
 
 def load_users():
     users = []
-    with open("app/Data/users.json", "r") as file:
+    with open(os.getcwd() + "/Data/users.json", "r") as file:
         data = json.load(file)
         for element in data["users"]:
             users.append(User(
@@ -121,11 +124,11 @@ def create_project(project):
         "roles": []
     }
 
-    with open("app/Data/projects.json", "r") as file:
+    with open(os.getcwd() + "/Data/projects.json", "r") as file:
         data = json.load(file)
         data["projects"].append(data_set)
 
-    with open("app/Data/projects.json", "w") as file:
+    with open(os.getcwd() + "/Data/projects.json", "w") as file:
         json.dump(data, file)
 
 
@@ -135,13 +138,13 @@ def add_role_to_project(role, project):
         "name": role.name,
         "role": role.role
     }
-    with open("app/Data/projects.json", "r") as file:
+    with open(os.getcwd() + "/Data/projects.json", "r") as file:
         data = json.load(file)
         for idx, p in enumerate(data["projects"]):
             if p["id"] == project.id:
                 data["projects"][idx]["roles"].append(data_set)
 
-    with open("app/Data/projects.json", "w") as file:
+    with open(os.getcwd() + "/Data/projects.json", "w") as file:
         json.dump(data, file)
 
 
@@ -156,18 +159,18 @@ def create_product(product, project):
         "messages": []
     }
 
-    with open("app/Data/projects.json", "r") as file:
+    with open(os.getcwd() + "/Data/projects.json", "r") as file:
         data = json.load(file)
         for idx, p in enumerate(data["projects"]):
             if p["id"] == project.id:
                 data["projects"][idx]["products"].append(data_set)
 
-    with open("app/Data/projects.json", "w") as file:
+    with open(os.getcwd() + "/Data/projects.json", "w") as file:
         json.dump(data, file)
 
 
 def edit_product(product, project):
-    with open("app/Data/projects.json", "r") as file:
+    with open(os.getcwd() + "/Data/projects.json", "r") as file:
         data = json.load(file)
         for projidx, proj in enumerate(data["projects"]):
             if proj["id"] == project.id:
@@ -178,12 +181,12 @@ def edit_product(product, project):
                         data["projects"][projidx]["products"][prodidx]["supplier"] = product.supplier
                         data["projects"][projidx]["products"][prodidx]["status"] = product.status
 
-    with open("app/Data/projects.json", "w") as file:
+    with open(os.getcwd() + "/Data/projects.json", "w") as file:
         json.dump(data, file)
 
 
 def edit_project(project):
-    with open("app/Data/projects.json", "r") as file:
+    with open(os.getcwd() + "/Data/projects.json", "r") as file:
         data = json.load(file)
         for projidx, proj in enumerate(data["projects"]):
             if proj["id"] == project.id:
@@ -194,7 +197,7 @@ def edit_project(project):
                 data["projects"][projidx]["deadline"] = project.deadline
                 data["projects"][projidx]["budget"] = project.budget
 
-    with open("app/Data/projects.json", "w") as file:
+    with open(os.getcwd() + "/Data/projects.json", "w") as file:
         json.dump(data, file)
 
 
@@ -207,7 +210,7 @@ def create_document(document, product, project):
         "last modified": document.lastModified
     }
 
-    with open("app/Data/projects.json", "r") as file:
+    with open(os.getcwd() + "/Data/projects.json", "r") as file:
         data = json.load(file)
         for projidx, proj in enumerate(data["projects"]):
             if proj["id"] == project.id:
@@ -216,13 +219,13 @@ def create_document(document, product, project):
                         data["projects"][projidx]["products"][prodidx]["documents"].append(
                             data_set)
 
-    with open("app/Data/projects.json", "w") as file:
+    with open(os.getcwd() + "/Data/projects.json", "w") as file:
         json.dump(data, file)
 
 
 def load_projects():
     projects = []
-    with open("app/Data/projects.json", "r") as file:
+    with open(os.getcwd() + "/Data/projects.json", "r") as file:
         data = json.load(file)
         for element in data["projects"]:
             creator = User(
@@ -262,7 +265,7 @@ def load_projects():
 
 
 def load_project(project):
-    with open("app/Data/projects.json", "r") as file:
+    with open(os.getcwd() + "/Data/projects.json", "r") as file:
         data = json.load(file)
         for element in data["projects"]:
             if element["id"] == project.id:
@@ -303,7 +306,7 @@ def load_project(project):
 
 def load_projects_for_user(user):
     projects = []
-    with open("app/Data/projects.json", "r") as file:
+    with open(os.getcwd() + "/Data/projects.json", "r") as file:
         data = json.load(file)
         for element in data["projects"]:
             access = False
@@ -355,13 +358,13 @@ def send_message(project, message, product=None):
             "time": message.time,
         }
 
-        with open("app/Data/projects.json", "r") as file:
+        with open(os.getcwd() + "/Data/projects.json", "r") as file:
             data = json.load(file)
             for idx, p in enumerate(data["projects"]):
                 if p["id"] == project.id:
                     data["projects"][idx]["messages"].append(data_set)
 
-        with open("app/Data/projects.json", "w") as file:
+        with open(os.getcwd() + "/Data/projects.json", "w") as file:
             json.dump(data, file)
     if product is not None:
         data_set = {
@@ -371,7 +374,7 @@ def send_message(project, message, product=None):
             "time": message.time,
         }
 
-        with open("app/Data/projects.json", "r") as file:
+        with open(os.getcwd() + "/Data/projects.json", "r") as file:
             data = json.load(file)
             for projidx, proj in enumerate(data["projects"]):
                 if proj["id"] == project.id:
@@ -380,5 +383,5 @@ def send_message(project, message, product=None):
                             data["projects"][projidx]["products"][prodidx]["messages"].append(
                                 data_set)
 
-        with open("app/Data/projects.json", "w") as file:
+        with open(os.getcwd() + "/Data/projects.json", "w") as file:
             json.dump(data, file)
