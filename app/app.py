@@ -1,7 +1,7 @@
 from tkinter import *
 from tkinter import messagebox
 from tkinter import filedialog
-#from PIL import Image, ImageTk
+from PIL import Image, ImageTk
 import dataAccess
 import os
 from datetime import datetime
@@ -391,7 +391,6 @@ class Project(Frame):
         self.creatorLabel.config(text=app.currentProject.creator.name)
         self.budgetlabel.config(text=app.currentProject.budget)
 
-
 class EditProject(Frame):
     def __init__(self, parent, controller):
         Frame.__init__(self, parent)
@@ -447,7 +446,6 @@ class EditProject(Frame):
         self.priorityEntry.delete(0, 'end')
         self.budgetEntry.delete(0, 'end')
         self.controller.open(Project)
-
 
 class CreateProject(Frame):
     def __init__(self, parent, controller):
@@ -753,7 +751,7 @@ class Product(Frame):
             document = self.product.documents[selection[0]]
             newWindow = Toplevel(self.controller)
             newWindow.title(document.name)
-            if document.type == ".jpg":
+            if document.type == ".jpg" or document.type == ".png":
                 img = ImageTk.PhotoImage(Image.open(document.file))
                 label = Label(newWindow, image=img)
                 label.image = img
@@ -870,14 +868,14 @@ class AddDocument(Frame):
 
     def add_document(self):
         filename, file_extension = os.path.splitext(self.filepath)
-        if self.filepath != "" and self.nameEntry.get() != "" and (file_extension == ".jpg" or file_extension == ".txt"):
+        if self.filepath != "" and self.nameEntry.get() != "" and (file_extension == ".jpg" or file_extension == ".txt" or file_extension == ".png"):
             uid = str(uuid.uuid1())
             document = dataAccess.Document(uid, self.nameEntry.get(), os.getcwd(
-            ) + "/app/Documents/" + uid + file_extension, file_extension, str(datetime.now()))
+            ) + "/Documents/" + uid + file_extension, file_extension, str(datetime.now()))
             dataAccess.create_document(
                 document, app.currentProduct, app.currentProject)
             copyfile(self.filepath, os.getcwd() +
-                     "/app/Documents/" + document.id + file_extension)
+                     "/Documents/" + document.id + file_extension)
             self.nameEntry.delete(1, 'end')
             self.pathLabel.config(text="")
             self.controller.open(Product)
@@ -889,9 +887,9 @@ class AddDocument(Frame):
         if self.filepath == "" and self.nameEntry.get() == "":
             messagebox.showerror(
                 "Error", "Please give a name to the Document, and select a file!")
-        if self.filepath != "" and self.nameEntry.get() != "" and file_extension != ".jpg" and file_extension != ".txt":
+        if self.filepath != "" and self.nameEntry.get() != "" and file_extension != ".jpg" and file_extension != ".txt" and file_extension != ".png":
             messagebox.showerror(
-                "Error", "Please select a file with .txt or .jpg extension!")
+                "Error", "Please select a file with .txt, .png or .jpg extension!")
 
 
 app = App()
