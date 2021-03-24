@@ -43,7 +43,6 @@ class App(Tk):
         frame.update()
         frame.tkraise()
 
-
 class StartPage(Frame):
     def __init__(self, parent, controller):
         Frame.__init__(self, parent)
@@ -67,7 +66,6 @@ class StartPage(Frame):
 
     def update(self):
         app.geometry("%dx%d" % (285, 140))
-
 
 class LogIn(Frame):
     def __init__(self, parent, controller):
@@ -113,7 +111,6 @@ class LogIn(Frame):
 
     def start_page(self):
         self.controller.open(StartPage)
-
 
 class SignUp(Frame):
     def __init__(self, parent, controller):
@@ -185,7 +182,6 @@ class SignUp(Frame):
 
     def update(self):
         app.geometry("%dx%d" % (285, 140))
-
 
 class Home(Frame):
     def __init__(self, parent, controller):
@@ -567,7 +563,6 @@ class AddMember(Frame):
             messagebox.showerror(
                 "Error", "There is no user with this email address: " + self.emailEntry.get())
 
-
 class CreateProduct(Frame):
     def __init__(self, parent, controller):
         Frame.__init__(self, parent)
@@ -622,7 +617,6 @@ class CreateProduct(Frame):
         if reference[-3:] == "000":
             valid = True
         return valid
-
 
 class Product(Frame):
     def __init__(self, parent, controller):
@@ -775,7 +769,6 @@ class Product(Frame):
         self.messageList.delete(0, 'end')
         self.messageList.insert("end", *message_list)
 
-
 class EditProduct(Frame):
     def __init__(self, parent, controller):
         Frame.__init__(self, parent)
@@ -825,7 +818,6 @@ class EditProduct(Frame):
         self.nameEntry.insert(0, app.currentProduct.name)
         self.referenceEntry.insert(0, app.currentProduct.reference)
         self.SupplierEntry.insert(0, app.currentProduct.supplier)
-
 
 class AddDocument(Frame):
     def __init__(self, parent, controller):
